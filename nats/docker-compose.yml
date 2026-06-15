@@ -1,0 +1,28 @@
+services:
+  nats:
+    image: nats:latest
+    command:
+      - "-c"
+      - "/etc/nats/nats-server.conf"
+      - "--routes=nats-route://ruser:T0pS3cr3t@nats-seed:6222"
+    volumes:
+      - ./nats_conf/nats-server.conf:/etc/nats/nats-server.conf:ro
+    expose:
+      - "4222"
+      - "6222"
+      - "8222"
+    depends_on:
+      - nats-seed
+
+  nats-seed:
+    image: nats:latest
+    command:
+      - "-c"
+      - "/etc/nats/nats-server.conf"
+    volumes:
+      - ./nats_conf/nats-server.conf:/etc/nats/nats-server.conf:ro
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    expose:
+      - "6222"
