@@ -2,6 +2,7 @@ use futures_util::{Stream, TryStreamExt};
 use async_compression::tokio::bufread::GzipDecoder;
 use tokio::io;
 use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio_util::bytes::Bytes;
 use tokio_util::io::StreamReader;
 
 #[tokio::main(flavor = "current_thread")]
@@ -19,8 +20,10 @@ async fn main() {
     let reader = StreamReader::new(stream);
     let decoder = GzipDecoder::new(reader);
     let mut lines = BufReader::new(decoder).lines();
+    let client = async_nats::connect("localhost:4222").await.unwrap();
 
     while let Some(line) = lines.next_line().await.unwrap() {
-        println!("{}", line);
+        client.publish("events", line.into()).await.unwrap();
     }
+    println!("Done");
 }
