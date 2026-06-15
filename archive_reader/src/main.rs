@@ -44,7 +44,8 @@ async fn main() {
         .unwrap();
 
     while let Some(line) = lines.next_line().await.unwrap() {
-        jetstream.publish("events", line.into()).await.unwrap().await.unwrap();
+        let ack = jetstream.publish("events", line.into()).await.unwrap();
+        ack.await.unwrap();
     }
     println!("Done");
     let end = std::time::SystemTime::now();
