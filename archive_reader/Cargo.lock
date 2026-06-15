@@ -17,6 +17,7 @@ dependencies = [
  "futures-util",
  "reqwest",
  "tokio",
+ "tokio-util",
 ]
 
 [[package]]
