@@ -7,6 +7,7 @@ use tokio_util::io::StreamReader;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
+    let now = std::time::SystemTime::now();
     let date = "2025-03-05";
     let hour = "12";
 
@@ -26,4 +27,7 @@ async fn main() {
         client.publish("events", line.into()).await.unwrap();
     }
     println!("Done");
+    let end = std::time::SystemTime::now();
+    let elapsed = end.duration_since(now).unwrap();
+    println!("Elapsed: {:?} ms", elapsed.as_millis());
 }
