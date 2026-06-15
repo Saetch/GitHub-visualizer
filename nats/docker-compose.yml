@@ -4,9 +4,10 @@ services:
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
+      - "-js"
       - "--routes=nats-route://ruser:T0pS3cr3t@nats-seed:6222"
     volumes:
-      - ./nats_conf/nats-server.conf:/etc/nats/nats-server.conf:ro
+      - ./nats_conf/nats-server1.conf:/etc/nats/nats-server.conf:ro
     expose:
       - "4222"
       - "6222"
@@ -19,6 +20,7 @@ services:
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
+      - "-js"
     volumes:
       - ./nats_conf/nats-server.conf:/etc/nats/nats-server.conf:ro
     ports:

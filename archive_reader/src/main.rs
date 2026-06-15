@@ -1,8 +1,14 @@
-use futures_util::{Stream, TryStreamExt};
 use async_compression::tokio::bufread::GzipDecoder;
-use tokio::io;
-use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio_util::bytes::Bytes;
+use async_nats::jetstream;
+use async_nats::jetstream::stream::{
+    Config as StreamConfig,
+    DiscardPolicy,
+    RetentionPolicy,
+    StorageType,
+};
+use futures_util::TryStreamExt;
+use std::time::Duration;
+use tokio::io::{self, AsyncBufReadExt, BufReader};
 use tokio_util::io::StreamReader;
 
 #[tokio::main(flavor = "current_thread")]
@@ -22,9 +28,23 @@ async fn main() {
     let decoder = GzipDecoder::new(reader);
     let mut lines = BufReader::new(decoder).lines();
     let client = async_nats::connect("localhost:4222").await.unwrap();
+    let jetstream = async_nats::jetstream::new(client);
+    jetstream
+        .get_or_create_stream(StreamConfig {
+            name: "GHARCHIVE".to_string(),
+            subjects: vec!["events".to_string()],
+            storage: StorageType::File,
+            retention: RetentionPolicy::Limits,
+            discard: DiscardPolicy::Old,
+            max_age: Duration::from_secs(24 * 60 * 60),
+            max_bytes: 5 * 1024 * 1024 * 1024,
+            ..Default::default()
+        })
+        .await
+        .unwrap();
 
     while let Some(line) = lines.next_line().await.unwrap() {
-        client.publish("events", line.into()).await.unwrap();
+        jetstream.publish("events", line.into()).await.unwrap().await.unwrap();
     }
     println!("Done");
     let end = std::time::SystemTime::now();
