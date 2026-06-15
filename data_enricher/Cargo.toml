@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+futures-util = "0.3.32"
+async-compression = { version = "0.4.42", features = ["tokio"] }
+tokio = { version = "1.52.3", features = ["rt", "rt-multi-thread", "macros"] }
+tokio-util = "0.7.18"
+reqwest = "0.13.4"
+async-nats = "0.49.1"
