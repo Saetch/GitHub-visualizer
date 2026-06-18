@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             time: guessed_time,
         };
 
-        let ack = jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
+        let ack = dispatch_jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
 
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
