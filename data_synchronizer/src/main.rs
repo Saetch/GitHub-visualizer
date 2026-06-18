@@ -1,3 +1,102 @@
-fn main() {
-    println!("Hello, world!");
+use std::ops::Add;
+use async_nats::jetstream;
+use async_nats::jetstream::consumer::{
+    AckPolicy,
+    DeliverPolicy,
+    pull::Config as PullConsumerConfig,
+};
+use async_nats::jetstream::stream::{
+    Config as StreamConfig,
+    DiscardPolicy,
+    RetentionPolicy,
+    StorageType,
+};
+use futures_util::StreamExt;
+use std::time::Duration;
+use chrono::{DateTime, Utc};
+use rand::random_range;
+use visualizer_protocol::GitEventMessage;
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct PartialPayload {
+    created_at: DateTime<Utc>,
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = async_nats::connect("localhost:4222").await?;
+    let jetstream = jetstream::new(client.clone());
+
+    // Ensure the stream exists. This is the storage layer.
+    let stream = jetstream
+        .get_or_create_stream(StreamConfig {
+            name: "ENRICHED_UNORDERED".to_string(),
+            subjects: vec!["events_undordered".to_string()],
+            storage: StorageType::Memory,
+            retention: RetentionPolicy::Interest,
+            discard: DiscardPolicy::Old,
+            max_age: Duration::from_secs(24 * 60 * 60),
+            max_bytes: 150 * 1024 * 1024,
+            ..Default::default()
+        })
+        .await?;
+
+    // Ensure a durable consumer exists. This is the read cursor.
+    let consumer = stream
+        .get_or_create_consumer(
+            "synchronizer",
+            PullConsumerConfig {
+                durable_name: Some("syncronizer".to_string()),
+                filter_subject: "events_unordered".to_string(),
+                ack_policy: AckPolicy::Explicit,
+                max_ack_pending: 500,
+                ack_wait: Duration::from_secs(60),
+                deliver_policy: DeliverPolicy::All,
+                ..Default::default()
+            },
+        )
+        .await?;
+
+    let mut messages = consumer.messages().await?;
+
+
+    let dispatch_jetstream = async_nats::jetstream::new(client);
+    dispatch_jetstream
+        .get_or_create_stream(StreamConfig {
+            name: "DISPATCHER_ORDERED".to_string(),
+            subjects: vec!["events_ordered".to_string()],
+            storage: StorageType::File,
+            retention: RetentionPolicy::Limits,
+            discard: DiscardPolicy::Old,
+            max_age: Duration::from_secs(2400 * 60 * 60),
+            max_bytes: 15 * 1024 * 1024 * 1024,
+            ..Default::default()
+
+        })
+        .await
+        .unwrap();
+
+    while let Some(message) = messages.next().await {
+        let message = message?;
+
+        let message_string = String::from_utf8(message.payload.to_vec());
+        println!(
+            "Received message: {}",
+            message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
+        );
+        let payload: GitEventMessage = serde_json::from_slice(&message.payload)?;
+        let time_of_event = match payload {
+            GitEventMessage::Placeholder { time, .. } => time,
+        };
+
+
+
+        let ack = jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
+
+        // Important: ack only after successful processing.
+        message.ack().await.unwrap();
+    }
+
+    Ok(())
 }
