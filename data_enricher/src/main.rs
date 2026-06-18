@@ -53,9 +53,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Some(message) = messages.next().await {
         let message = message?;
 
+        let message_string = String::from_utf8(message.payload.to_vec());
         println!(
             "Received message: {}",
-            String::from_utf8_lossy(&message.payload)
+            message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
         );
 
         // Important: ack only after successful processing.
