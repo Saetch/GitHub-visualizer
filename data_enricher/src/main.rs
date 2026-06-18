@@ -57,7 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dispatch_jetstream
         .get_or_create_stream(StreamConfig {
             name: "ENRICHED_UNORDERED".to_string(),
-            subjects: vec!["events".to_string()],
+            subjects: vec!["events_unordered".to_string()],
             storage: StorageType::Memory,
             retention: RetentionPolicy::Interest,
             discard: DiscardPolicy::Old,
@@ -84,7 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             event_description: "Fake created event".to_string(),
         };
 
-        let ack = jetstream.publish("events", serde_json::to_string(&ge_message)?.into()).await?;
+        let ack = jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
 
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
