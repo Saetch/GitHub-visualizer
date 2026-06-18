@@ -303,6 +303,7 @@ dependencies = [
  "async-compression",
  "async-nats",
  "futures-util",
+ "rand 0.10.1",
  "reqwest",
  "tokio",
  "tokio-util",

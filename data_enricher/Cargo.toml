@@ -11,3 +11,4 @@ visualizer_protocol = { path = "../visualizer_protocol" }
 tokio-util = "0.7.18"
 reqwest = "0.13.4"
 async-nats = "0.49.1"
+rand = "0.10.1"

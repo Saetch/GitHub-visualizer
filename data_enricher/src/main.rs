@@ -12,6 +12,8 @@ use async_nats::jetstream::stream::{
 };
 use futures_util::StreamExt;
 use std::time::Duration;
+use rand::random_range;
+use visualizer_protocol::GitEventMessage;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -59,6 +61,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
         );
 
+        let ge_message = GitEventMessage::Placeholder {
+            location_x: random_range(0.0..1.0),
+            location_y: random_range(0.0..1.0),
+            event_description: "Fake created event".to_string(),
+        };
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
     }
