@@ -7,6 +7,7 @@ edition = "2024"
 futures-util = "0.3.32"
 async-compression = { version = "0.4.42", features = ["tokio"] }
 tokio = { version = "1.52.3", features = ["rt", "rt-multi-thread", "macros"] }
+visualizer_protocol = { path = "../visualizer_protocol" }
 tokio-util = "0.7.18"
 reqwest = "0.13.4"
 async-nats = "0.49.1"
