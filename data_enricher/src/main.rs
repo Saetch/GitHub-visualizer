@@ -1,3 +1,4 @@
+use std::ops::Add;
 use async_nats::jetstream;
 use async_nats::jetstream::consumer::{
     AckPolicy,
@@ -12,8 +13,15 @@ use async_nats::jetstream::stream::{
 };
 use futures_util::StreamExt;
 use std::time::Duration;
+use chrono::{DateTime, Utc};
 use rand::random_range;
 use visualizer_protocol::GitEventMessage;
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct PartialPayload {
+    created_at: DateTime<Utc>,
+}
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -77,11 +85,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "Received message: {}",
             message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
         );
-
+        let partial_payload: PartialPayload = serde_json::from_slice(&message.payload)?;
+        let time_of_event = partial_payload.created_at;
+        let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
         let ge_message = GitEventMessage::Placeholder {
             location_x: random_range(0.0..1.0),
             location_y: random_range(0.0..1.0),
             event_description: "Fake created event".to_string(),
+            time: guessed_time,
         };
 
         let ack = jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
