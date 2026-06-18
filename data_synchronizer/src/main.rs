@@ -47,10 +47,6 @@ impl BufferedMessage {
     }
 }
 
-impl BufferedMessage {
-
-}
-
 impl Eq for BufferedMessage {}
 
 impl PartialEq<Self> for BufferedMessage {
