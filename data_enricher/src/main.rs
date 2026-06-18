@@ -18,7 +18,7 @@ use visualizer_protocol::GitEventMessage;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = async_nats::connect("localhost:4222").await?;
-    let jetstream = jetstream::new(client);
+    let jetstream = jetstream::new(client.clone());
 
     // Ensure the stream exists. This is the storage layer.
     let stream = jetstream
@@ -52,6 +52,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut messages = consumer.messages().await?;
 
+
+    let dispatch_jetstream = async_nats::jetstream::new(client);
+    dispatch_jetstream
+        .get_or_create_stream(StreamConfig {
+            name: "ENRICHED_UNORDERED".to_string(),
+            subjects: vec!["events".to_string()],
+            storage: StorageType::Memory,
+            retention: RetentionPolicy::Interest,
+            discard: DiscardPolicy::Old,
+            max_age: Duration::from_secs(24 * 60 * 60),
+            max_bytes: 150 * 1024 * 1024,
+            ..Default::default()
+
+        })
+        .await
+        .unwrap();
+
     while let Some(message) = messages.next().await {
         let message = message?;
 
@@ -66,6 +83,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             location_y: random_range(0.0..1.0),
             event_description: "Fake created event".to_string(),
         };
+
+        let ack = jetstream.publish("events", serde_json::to_string(&ge_message)?.into()).await?;
+
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
     }

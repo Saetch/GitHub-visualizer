@@ -305,6 +305,7 @@ dependencies = [
  "futures-util",
  "rand 0.10.1",
  "reqwest",
+ "serde_json",
  "tokio",
  "tokio-util",
  "visualizer_protocol",
