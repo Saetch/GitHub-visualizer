@@ -125,13 +125,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut binary_buffer : BinaryHeap<Reverse<BufferedMessage>> = BinaryHeap::new();
     loop {
         let next_deadline = binary_buffer.peek().map(|Reverse(buffered_message)| buffered_message.time_to_wait_for);
+        let now = Instant::now();
+        println!("Next deadline in: {:?}", next_deadline.map(|deadline| deadline.duration_since(now)));
         tokio::select! {
-
             _ = sleep_until_optional(next_deadline)=> {
 
                 let buffered_message = binary_buffer.pop().unwrap().0;
                 let payload = buffered_message.git_event_message;
                 dispatch_jetstream.publish("events_ordered", serde_json::to_string(&payload)?.into()).await?;
+                println!("Dispatched message: {:?}", payload);
             },
 
 
@@ -139,10 +141,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if let Some(message) = msg {
                     let message = message?;
                     let message_string = String::from_utf8(message.payload.to_vec());
-                    println!(
-                        "Received message: {}",
-                        message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
-                    );
                     let payload: GitEventMessage = serde_json::from_slice(&message.payload)?;
                     let time_of_event = match payload {
                         GitEventMessage::Placeholder { time, .. } => time,
@@ -150,11 +148,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let time_plus_wait_time = Instant::now().add(HOLD_FOR);
                     let buffered_message = BufferedMessage::new(payload, time_of_event, time_plus_wait_time);
                     binary_buffer.push(Reverse(buffered_message));
+                    println!("Received time: {:?}", time_of_event);
                     message.ack().await;
                 }else{
                     println!("No more messages!");
                     break;
                 }
+            }
+            _ = sleep_until(Instant::now().add(Duration::from_secs(5))) => {
+                println!("I am alive!");
             }
         }
     }
