@@ -45,6 +45,7 @@ async fn ws_handler(
                     match event {
                         Ok(text) => {
                             println!("{}", String::from_utf8(text.payload.to_vec()).unwrap());
+                            text.ack().await.expect("ack failed");
                         }
                         Err(e) => {
                             eprintln!("NATS error: {}", e);
