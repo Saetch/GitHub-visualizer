@@ -6,10 +6,8 @@ use async_nats::jetstream;
 use async_nats::jetstream::consumer::{AckPolicy, DeliverPolicy, pull::Config as PullConsumerConfig};
 use async_nats::jetstream::stream::{Config as StreamConfig, DiscardPolicy, RetentionPolicy, StorageType};
 use futures_util::StreamExt;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
-use tokio::sync::broadcast;
 
 struct AppState {
     counter: AtomicU64,
@@ -24,10 +22,13 @@ async fn ws_handler(
     let (response, session, mut msg_stream) = actix_ws::handle(&req, body)?;
     let i = state.counter.fetch_add(1, Ordering::SeqCst);
     println!("{} connections established in total", i);
+    let uuid = uuid::Uuid::new_v4();
+    let consumer_name = format!("ws-gateway-{}-{}", i, uuid);
+
     let consumer = state.stream.get_or_create_consumer(
-        "ws-gateway",
+        &consumer_name,
         PullConsumerConfig {
-            durable_name: Some("ws-gateway".to_string()),
+            durable_name: Some(consumer_name.clone()),
             filter_subject: "events_ordered".to_string(),
             ack_policy: AckPolicy::Explicit,
             ack_wait: Duration::from_secs(30),
@@ -66,6 +67,7 @@ async fn ws_handler(
             }
         }
         let _ = session.close(None).await;
+        state.stream.delete_consumer(&consumer_name).await.expect("consumer delete failed");
     });
 
     Ok(response)
