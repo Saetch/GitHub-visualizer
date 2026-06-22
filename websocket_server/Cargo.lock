@@ -401,6 +401,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -1412,9 +1413,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.40"
+version = "0.23.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef86cd5876211988985292b91c96a8f2d298df24e75989a43a3c73f2d4d8168b"
+checksum = "6b92b125634d9b795e7beca796cc790df15a7fb38323bf3196fda83292d06b1f"
 dependencies = [
  "once_cell",
  "ring",
@@ -1981,6 +1982,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "visualizer_protocol"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2067,8 +2076,11 @@ dependencies = [
  "async-nats",
  "chrono",
  "futures-util",
+ "serde",
+ "serde_json",
  "tokio",
  "uuid",
+ "visualizer_protocol",
 ]
 
 [[package]]

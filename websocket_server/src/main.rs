@@ -8,10 +8,13 @@ use async_nats::jetstream::stream::{Config as StreamConfig, DiscardPolicy, Reten
 use futures_util::StreamExt;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
+use actix_web::cookie::time::macros::date;
 use actix_web::web::Data;
 use chrono::{DateTime, Utc};
+use serde::de::IntoDeserializer;
 use tokio::io::AsyncReadExt;
 use tokio::sync::{RwLock, RwLockWriteGuard};
+use visualizer_protocol::GitEventMessage;
 
 struct AppState {
     counter: AtomicU64,
@@ -144,8 +147,23 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, time: Da
     let highest_allowed_index =lock.stream.info().await.expect("stream info failed").state.last_sequence;
     drop(lock);
 
-    let read_lock = state.read().await;
+    let date_found = false;
+    let mid = (highest_allowed_index + lowest_allowed_index) / 2;
+    let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
+    let string = String::from_utf8(msg.payload.to_vec()).unwrap();
+    let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();
+    let time = match protocol_message {
+        GitEventMessage::Placeholder { time, ..} => {
+            time
+        }
+    };
+    println!("{:?}", time);
 
+    /*
+    while (!date_found) {
+        if()
+    }
+ */
 
 
 
