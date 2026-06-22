@@ -88,14 +88,6 @@ async fn main() -> std::io::Result<()> {
     }).await.expect("stream setup failed");
 
 
-
-    let (tx, _rx) = broadcast::channel::<String>(1024);
-    let tx = Arc::new(tx);
-
-    {
-        let tx = tx.clone();
-    }
-
     let state = web::Data::new(AppState {
         counter: AtomicU64::new(0),
         stream,
