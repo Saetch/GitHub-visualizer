@@ -113,6 +113,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             storage: StorageType::File,
             retention: RetentionPolicy::Limits,
             discard: DiscardPolicy::Old,
+            allow_direct: true,
             max_age: Duration::from_secs(2400 * 60 * 60),
             max_bytes: 15 * 1024 * 1024 * 1024,
             ..Default::default()

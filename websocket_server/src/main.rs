@@ -92,6 +92,7 @@ async fn main() -> std::io::Result<()> {
         discard: DiscardPolicy::Old,
         max_age: Duration::from_secs(2400 * 60 * 60),
         max_bytes: 15 * 1024 * 1024 * 1024,
+        allow_direct: true,
         ..Default::default()
     }).await.expect("stream setup failed");
 
