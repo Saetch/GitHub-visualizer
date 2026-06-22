@@ -10,6 +10,7 @@ use tokio::sync::broadcast;
 
 struct AppState {
     tx: broadcast::Sender<String>,
+    counter: u64,
 }
 
 async fn ws_handler(
@@ -18,7 +19,6 @@ async fn ws_handler(
     state: web::Data<AppState>,
 ) -> actix_web::Result<HttpResponse> {
     let (response, mut session, mut msg_stream) = actix_ws::handle(&req, body)?;
-
     let mut rx = state.tx.subscribe();
 
     actix_web::rt::spawn(async move {
@@ -81,7 +81,7 @@ async fn main() -> std::io::Result<()> {
             filter_subject: "events_ordered".to_string(),
             ack_policy: AckPolicy::Explicit,
             ack_wait: Duration::from_secs(30),
-            deliver_policy: DeliverPolicy::New,
+            deliver_policy: DeliverPolicy::All,
             ..Default::default()
         },
     ).await.expect("consumer setup failed");
@@ -105,6 +105,7 @@ async fn main() -> std::io::Result<()> {
 
     let state = web::Data::new(AppState {
         tx: (*tx).clone(),
+        counter: 0,
     });
 
     HttpServer::new(move || {
