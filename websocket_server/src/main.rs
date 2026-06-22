@@ -7,11 +7,12 @@ use async_nats::jetstream::consumer::{AckPolicy, DeliverPolicy, pull::Config as 
 use async_nats::jetstream::stream::{Config as StreamConfig, DiscardPolicy, RetentionPolicy, StorageType};
 use futures_util::StreamExt;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 use tokio::sync::broadcast;
 
 struct AppState {
-    counter: u64,
+    counter: AtomicU64,
     stream: jetstream::stream::Stream,
 }
 
@@ -20,7 +21,9 @@ async fn ws_handler(
     body: web::Payload,
     state: web::Data<AppState>,
 ) -> actix_web::Result<HttpResponse> {
-    let (response, mut session, mut msg_stream) = actix_ws::handle(&req, body)?;
+    let (response, session, mut msg_stream) = actix_ws::handle(&req, body)?;
+    let i = state.counter.fetch_add(1, Ordering::SeqCst);
+    println!("{} connections established in total", i);
     let consumer = state.stream.get_or_create_consumer(
         "ws-gateway",
         PullConsumerConfig {
@@ -94,7 +97,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     let state = web::Data::new(AppState {
-        counter: 0,
+        counter: AtomicU64::new(0),
         stream,
     });
 
