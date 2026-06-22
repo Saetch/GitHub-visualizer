@@ -1,13 +1,14 @@
 use std::os::macos::raw::stat;
 use crate::jetstream::consumer::pull::Stream;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
-use actix_ws::{Message};
+use actix_ws::{Message, MessageStream, Session};
 use async_nats::jetstream;
 use async_nats::jetstream::consumer::{AckPolicy, DeliverPolicy, pull::Config as PullConsumerConfig};
 use async_nats::jetstream::stream::{Config as StreamConfig, DiscardPolicy, RetentionPolicy, StorageType};
 use futures_util::StreamExt;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
+use actix_web::web::Data;
 
 struct AppState {
     counter: AtomicU64,
@@ -19,7 +20,7 @@ async fn ws_handler(
     body: web::Payload,
     state: web::Data<AppState>,
 ) -> actix_web::Result<HttpResponse> {
-    let (response, session, mut msg_stream) = actix_ws::handle(&req, body)?;
+    let (response, session, msg_stream) = actix_ws::handle(&req, body)?;
     let i = state.counter.fetch_add(1, Ordering::SeqCst);
     println!("{} connections established in total", i);
     let uuid = uuid::Uuid::new_v4();
@@ -36,10 +37,17 @@ async fn ws_handler(
             ..Default::default()
         },
     ).await.expect("consumer setup failed");
-    let mut messages = consumer.messages().await.expect("consumer stream failed");
-    actix_web::rt::spawn(async move {
-        loop {
-            tokio::select! {
+    let messages = consumer.messages().await.expect("consumer stream failed");
+    actix_web::rt::spawn(
+        websocket_loop(messages, msg_stream, state, session, consumer_name)
+    );
+
+    Ok(response)
+}
+
+async fn websocket_loop(mut messages: Stream, mut msg_stream: MessageStream, state: Data<AppState>, mut session: Session, consumer_name: String){
+    loop {
+        tokio::select! {
                 // NATS event -> WebSocket client
                 Some(event) = messages.next() => {
                     match event {
@@ -66,12 +74,9 @@ async fn ws_handler(
                     }
                 }
             }
-        }
-        let _ = session.close(None).await;
-        state.stream.delete_consumer(&consumer_name).await.expect("consumer delete failed");
-    });
-
-    Ok(response)
+    }
+    let _ = session.close(None).await;
+    state.stream.delete_consumer(&consumer_name).await.expect("consumer delete failed");
 }
 
 #[actix_web::main]
