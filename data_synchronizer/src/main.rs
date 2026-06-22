@@ -27,7 +27,7 @@ struct PartialPayload {
     created_at: DateTime<Utc>,
 }
 
-const HOLD_FOR: Duration = Duration::from_secs(138);
+const HOLD_FOR: Duration = Duration::from_secs(248);
 
 #[derive(Debug)]
 struct BufferedMessage {
@@ -123,10 +123,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
     let mut binary_buffer : BinaryHeap<Reverse<BufferedMessage>> = BinaryHeap::new();
+    let mut old_time = None;
     loop {
         let next_deadline = binary_buffer.peek().map(|Reverse(buffered_message)| buffered_message.time_to_wait_for);
         let now = Instant::now();
-        println!("Next deadline in: {:?}", next_deadline.map(|deadline| deadline.duration_since(now)));
         tokio::select! {
             _ = sleep_until_optional(next_deadline)=> {
 
@@ -145,10 +145,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let time_of_event = match payload {
                         GitEventMessage::Placeholder { time, .. } => time,
                     };
+                    old_time = Some(time_of_event);
                     let time_plus_wait_time = Instant::now().add(HOLD_FOR);
                     let buffered_message = BufferedMessage::new(payload, time_of_event, time_plus_wait_time);
                     binary_buffer.push(Reverse(buffered_message));
-                    println!("Received time: {:?}", time_of_event);
                     message.ack().await;
                 }else{
                     println!("No more messages!");
