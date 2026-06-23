@@ -150,6 +150,9 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_t
 
     let mut mid = (highest_allowed_index + lowest_allowed_index) / 2;
     println!("mid: {}", mid);
+    if mid == 0 {
+        return 0;
+    }
     let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
     let string = String::from_utf8(msg.payload.to_vec()).unwrap();
     let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();

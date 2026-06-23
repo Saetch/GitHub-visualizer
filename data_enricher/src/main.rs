@@ -25,6 +25,7 @@ struct PartialPayload {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut message_nmbr = 0;
     let client = async_nats::connect("localhost:4222").await?;
     let jetstream = jetstream::new(client.clone());
 
@@ -94,6 +95,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
+        message_nmbr += 1;
+        println!("Processed message {}.", message_nmbr);
     }
 
     Ok(())

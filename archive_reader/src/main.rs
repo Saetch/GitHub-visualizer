@@ -42,12 +42,18 @@ async fn main() {
         })
         .await
         .unwrap();
-
+    let mut line_nmbr = 0;
     while let Some(line) = lines.next_line().await.unwrap() {
         let ack = jetstream.publish("events", line.into()).await.unwrap();
+        line_nmbr += 1;
+        if line_nmbr % 1000 == 0 {
+            println!("Processed {} lines", line_nmbr);
+        }
     }
     println!("Done");
+
     let end = std::time::SystemTime::now();
     let elapsed = end.duration_since(now).unwrap();
     println!("Elapsed: {:?} ms", elapsed.as_millis());
+    println!("Processed {} lines", line_nmbr);
 }

@@ -124,7 +124,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
     let mut binary_buffer : BinaryHeap<Reverse<BufferedMessage>> = BinaryHeap::new();
-    let mut old_time = None;
     loop {
         let next_deadline = binary_buffer.peek().map(|Reverse(buffered_message)| buffered_message.time_to_wait_for);
         let now = Instant::now();
@@ -146,7 +145,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let time_of_event = match payload {
                         GitEventMessage::Placeholder { time, .. } => time,
                     };
-                    old_time = Some(time_of_event);
                     let time_plus_wait_time = Instant::now().add(HOLD_FOR);
                     let buffered_message = BufferedMessage::new(payload, time_of_event, time_plus_wait_time);
                     binary_buffer.push(Reverse(buffered_message));
