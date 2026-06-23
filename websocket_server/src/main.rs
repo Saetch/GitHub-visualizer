@@ -1,3 +1,4 @@
+use std::ops::Add;
 use std::os::macos::raw::stat;
 use crate::jetstream::consumer::pull::Stream;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
@@ -69,7 +70,7 @@ async fn websocket_loop(mut messages: Stream, mut msg_stream: MessageStream, del
                 Some(event) = messages.next() => {
                     match event {
                         Ok(text) => {
-                            println!("{}", String::from_utf8(text.payload.to_vec()).unwrap());
+                            session.text(String::from_utf8(text.payload.to_vec()).unwrap()).await.expect("send failed");
                             text.ack().await.expect("ack failed");
                         }
                         Err(e) => {
@@ -141,32 +142,46 @@ async fn main() -> std::io::Result<()> {
 }
 
 
-async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, time: DateTime<Utc>) -> u64 {
+async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_time: DateTime<Utc>) -> u64 {
     let mut lock = state.write().await;
-    let lowest_allowed_index = lock.stream.info().await.expect("stream info failed").state.first_sequence;
-    let highest_allowed_index =lock.stream.info().await.expect("stream info failed").state.last_sequence;
+    let mut lowest_allowed_index = lock.stream.info().await.expect("stream info failed").state.first_sequence;
+    let mut highest_allowed_index =lock.stream.info().await.expect("stream info failed").state.last_sequence;
     drop(lock);
 
-    let date_found = false;
-    let mid = (highest_allowed_index + lowest_allowed_index) / 2;
+    let mut mid = (highest_allowed_index + lowest_allowed_index) / 2;
+    println!("mid: {}", mid);
     let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
     let string = String::from_utf8(msg.payload.to_vec()).unwrap();
     let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();
-    let time = match protocol_message {
+    let mut time = match protocol_message {
         GitEventMessage::Placeholder { time, ..} => {
             time
         }
     };
     println!("{:?}", time);
 
-    /*
-    while (!date_found) {
-        if()
+    while !(time < target_time.add(Duration::from_secs(10)) || time.add(Duration::from_secs(10)) < target_time ) && lowest_allowed_index < highest_allowed_index {
+        if time < target_time {
+            lowest_allowed_index = mid + 1;
+        } else {
+            highest_allowed_index = mid - 1;
+        }
+        println!("index ranging from {} to {}", lowest_allowed_index, highest_allowed_index);
+        mid = (highest_allowed_index + lowest_allowed_index) / 2;
+
+        let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
+        let string = String::from_utf8(msg.payload.to_vec()).unwrap();
+        let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();
+        time = match protocol_message {
+            GitEventMessage::Placeholder { time, ..} => {
+                time
+            }
+        };
+        println!("mid: {}", mid);
+
+        println!("{:?}", time);
     }
- */
 
+    mid
 
-
-
-    return 0;
 }
