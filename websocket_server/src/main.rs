@@ -37,7 +37,7 @@ async fn ws_handler(
 
     let date = "2025-03-05";
     let hour = "12";
-    let minute = "17";
+    let minute = "54";
     let start_time: DateTime<Utc> = DateTime::parse_from_rfc3339(&format!("{}T{}:{}:00Z", date, hour, minute)).unwrap().into();
 
     let index_to_start_at = find_correct_sequence_for_time(&state, start_time).await;
@@ -163,7 +163,11 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_t
     };
     println!("{:?}", time);
 
-    while !(time < target_time.add(Duration::from_secs(10)) || time.add(Duration::from_secs(10)) < target_time ) && lowest_allowed_index < highest_allowed_index {
+    while !(time < target_time.add(Duration::from_secs(10)) && time.add(Duration::from_secs(10)) > target_time )  {
+        if lowest_allowed_index > highest_allowed_index{
+            println!("Running out of indices. Going with current target: {} - index {}", time, mid);
+            break;
+        }
         if time < target_time {
             lowest_allowed_index = mid + 1;
         } else {
