@@ -80,11 +80,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Some(message) = messages.next().await {
         let message = message?;
 
-        let message_string = String::from_utf8(message.payload.to_vec());
-        println!(
-            "Received message: {}",
-            message_string.unwrap_or_else(|_| "Invalid UTF-8".to_string())
-        );
         let partial_payload: PartialPayload = serde_json::from_slice(&message.payload)?;
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
