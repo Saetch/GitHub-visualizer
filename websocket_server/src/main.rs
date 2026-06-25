@@ -14,6 +14,7 @@ use actix_web::cookie::time::macros::date;
 use actix_web::web::Data;
 use async_nats::jetstream::consumer::pull::{MessagesError, MessagesErrorKind};
 use chrono::{DateTime, TimeDelta, Utc};
+use geojson::Feature;
 use serde::de::IntoDeserializer;
 use tokio::io::AsyncReadExt;
 use tokio::sync::{RwLock, RwLockWriteGuard};
@@ -72,7 +73,9 @@ async fn websocket_loop(mut messages: Stream, mut msg_stream: MessageStream, del
     tokio::select! {
         string = get_next_message_async(&mut messages) => {
             let string = string.unwrap();
-            let visualizer_msg : GitEventMessage = serde_json::from_str(&string).unwrap();
+            let geojson_feature: Feature = string.parse().unwrap();
+            let vis_me_prop = geojson_feature.property("visualizer_message").unwrap();
+            let visualizer_msg: GitEventMessage = serde_json::from_value(vis_me_prop.clone()).unwrap();   //<-- evil unwraps
             first_message_time = match visualizer_msg {
                 GitEventMessage::Placeholder { time, ..} => time
             };
@@ -144,14 +147,11 @@ async fn get_next_timed_message_async(stream: &mut Stream, original_time: DateTi
                 return Err(MessagesError::new(MessagesErrorKind::Other));
             }
         };
-        let visualizer_message_res = serde_json::from_str(&string);
-        let visualizer_message: visualizer_protocol::GitEventMessage = match visualizer_message_res {
-            Ok(visualizer_message) => visualizer_message,
-            Err(e) => {
-                eprintln!("WS error: {}", e);
-                return Err(MessagesError::new(MessagesErrorKind::Other));
-            }
-        };
+
+        let geojson_feature: Feature = string.parse().unwrap();
+        let vis_me_prop = geojson_feature.property("visualizer_message").unwrap();
+        let visualizer_message: GitEventMessage = serde_json::from_value(vis_me_prop.clone()).unwrap();
+
         let message_time = match visualizer_message {
             GitEventMessage::Placeholder { time, ..} => time
         };
