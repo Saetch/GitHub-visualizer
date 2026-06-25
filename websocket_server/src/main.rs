@@ -1,3 +1,4 @@
+use std::string::String;
 use std::ops::Add;
 use std::os::macos::raw::stat;
 use crate::jetstream::consumer::pull::Stream;
@@ -11,10 +12,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 use actix_web::cookie::time::macros::date;
 use actix_web::web::Data;
-use chrono::{DateTime, Utc};
+use async_nats::jetstream::consumer::pull::{MessagesError, MessagesErrorKind};
+use chrono::{DateTime, TimeDelta, Utc};
 use serde::de::IntoDeserializer;
 use tokio::io::AsyncReadExt;
 use tokio::sync::{RwLock, RwLockWriteGuard};
+use tokio::time::sleep;
 use visualizer_protocol::GitEventMessage;
 
 struct AppState {
@@ -64,14 +67,38 @@ async fn ws_handler(
 }
 
 async fn websocket_loop(mut messages: Stream, mut msg_stream: MessageStream, delete_sender: tokio::sync::mpsc::Sender<String>, mut session: Session, consumer_name: String){
-    loop {
+    let mut looping = true; // first message successful. This is used in order to determine the real offset used for playback
+    let mut first_message_time = Utc::now(); //will be overridden by the first message
+    tokio::select! {
+        string = get_next_message_async(&mut messages) => {
+            let string = string.unwrap();
+            let visualizer_msg : GitEventMessage = serde_json::from_str(&string).unwrap();
+            first_message_time = match visualizer_msg {
+                GitEventMessage::Placeholder { time, ..} => time
+            };
+            session.text(string).await.expect("send failed");
+        }
+        msg = msg_stream.next() => {
+            match msg {
+                Some(Ok(Message::Close(_))) | None => looping = false,
+                Some(Err(e)) => {
+                    eprintln!("WS error: {}", e);
+                    looping = false;
+                }
+                _ => {}
+            }
+        }
+    }
+    let playback_start_time = Utc::now();
+
+    while looping {
         tokio::select! {
                 // NATS event -> WebSocket client
-                Some(event) = messages.next() => {
-                    match event {
+                message_string = get_next_timed_message_async(&mut messages, first_message_time, playback_start_time) => {
+                    match message_string {
                         Ok(text) => {
-                            session.text(String::from_utf8(text.payload.to_vec()).unwrap()).await.expect("send failed");
-                            text.ack().await.expect("ack failed");
+
+                            session.text(text).await.expect("send failed");
                         }
                         Err(e) => {
                             eprintln!("NATS error: {}", e);
@@ -95,6 +122,67 @@ async fn websocket_loop(mut messages: Stream, mut msg_stream: MessageStream, del
     }
     let _ = session.close(None).await;
     delete_sender.send(consumer_name).await.expect("delete sender failed");
+}
+
+async fn get_next_timed_message_async(stream: &mut Stream, original_time: DateTime<Utc>, playback_start_time: DateTime<Utc>) -> Result<String, MessagesError>{
+    if let Some(msg)= stream.next().await{
+        let content = match msg {
+            Ok(msg) => {
+                let cont = String::from_utf8(msg.payload.to_vec());
+                msg.ack().await.expect("Couldnt ack read message: panic ensues!");
+                cont
+            }
+            Err(e) => {
+                eprintln!("NATS error: {}", e);
+                return Err(MessagesError::new(MessagesErrorKind::Other));
+            }
+        };
+        let string = match content {
+            Ok(content) => content,
+            Err(e) => {
+                eprintln!("WS error: {}", e);
+                return Err(MessagesError::new(MessagesErrorKind::Other));
+            }
+        };
+        let visualizer_message_res = serde_json::from_str(&string);
+        let visualizer_message: visualizer_protocol::GitEventMessage = match visualizer_message_res {
+            Ok(visualizer_message) => visualizer_message,
+            Err(e) => {
+                eprintln!("WS error: {}", e);
+                return Err(MessagesError::new(MessagesErrorKind::Other));
+            }
+        };
+        let message_time = match visualizer_message {
+            GitEventMessage::Placeholder { time, ..} => time
+        };
+        let passed_time = Utc::now() - playback_start_time;
+        let supposed_passed_time = message_time - original_time;
+        if let Ok(time_to_wait) = (supposed_passed_time-passed_time).to_std() {
+            tokio::time::sleep(time_to_wait).await;
+        } //will produce an Err if it is negative. But in this case we should just dispatch it right away
+
+        return Ok(string);
+    }
+
+
+    Ok(String::from("placeholder. This should never happen."))
+}
+
+async fn get_next_message_async(stream: &mut Stream) -> Result<String, MessagesError>{
+    if let Some(msg)= stream.next().await{
+        let content =  String::from_utf8(msg?.payload.to_vec());
+        let string = match content {
+            Ok(content) => content,
+            Err(e) => {
+                eprintln!("WS error: {}", e);
+                return Err(MessagesError::new(MessagesErrorKind::Other));
+            }
+        };
+        return Ok(string);
+    }
+
+    eprintln!("No message received");
+    Err(MessagesError::new(MessagesErrorKind::Other))
 }
 
 #[actix_web::main]
