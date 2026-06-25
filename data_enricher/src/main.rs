@@ -14,6 +14,8 @@ use async_nats::jetstream::stream::{
 use futures_util::StreamExt;
 use std::time::Duration;
 use chrono::{DateTime, Utc};
+use geojson::GeometryValue::Point;
+use geojson::{Feature, JsonObject, PointType};
 use rand::random_range;
 use visualizer_protocol::GitEventMessage;
 use serde::Deserialize;
@@ -85,13 +87,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
         let ge_message = GitEventMessage::Placeholder {
-            location_x: random_range(0.0..1.0),
-            location_y: random_range(0.0..1.0),
             event_description: "Fake created event".to_string(),
             time: guessed_time,
         };
+        let geometry = geojson::Geometry::new(Point { coordinates: PointType::from([random_range(0.0..1.0), random_range(0.0..1.0)]) });
+        let mut props = JsonObject::new();
+        props.insert("visualizer_message".to_string(), serde_json::to_value(ge_message)?);
+        //create a geojson Feature with the event data
+        let feature = Feature {
+            bbox: None,
+            geometry: Some(geometry),
+            id: None,
+            properties: Some(props),
+            foreign_members: None,
+        };
 
-        let ack = dispatch_jetstream.publish("events_unordered", serde_json::to_string(&ge_message)?.into()).await?;
+        let ack = dispatch_jetstream.publish("events_unordered", serde_json::to_string(&feature)?.into()).await?;
 
         // Important: ack only after successful processing.
         message.ack().await.unwrap();
