@@ -243,7 +243,9 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_t
     }
     let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
     let string = String::from_utf8(msg.payload.to_vec()).unwrap();
-    let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();
+    let geojson_feature: Feature = string.parse().unwrap();
+    let vis_me_prop = geojson_feature.property("visualizer_message").unwrap();
+    let protocol_message: GitEventMessage = serde_json::from_value(vis_me_prop.clone()).unwrap();
     let mut time = match protocol_message {
         GitEventMessage::Placeholder { time, ..} => {
             time
@@ -266,7 +268,9 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_t
 
         let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
         let string = String::from_utf8(msg.payload.to_vec()).unwrap();
-        let protocol_message: GitEventMessage = serde_json::from_str(&string).unwrap();
+        let geojson_feature: Feature = string.parse().unwrap();
+        let vis_me_prop = geojson_feature.property("visualizer_message").unwrap();
+        let protocol_message: GitEventMessage = serde_json::from_value(vis_me_prop.clone()).unwrap();
         time = match protocol_message {
             GitEventMessage::Placeholder { time, ..} => {
                 time
