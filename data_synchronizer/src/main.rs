@@ -145,8 +145,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let message_string = String::from_utf8(message.payload.to_vec());
 
                     let geojson_feature: Feature = message_string?.parse()?;
-                    let time_of_event = match serde_json::from_str(geojson_feature.property("visualizer_message").unwrap().as_str().unwrap()) {
-                        Ok(GitEventMessage::Placeholder { time, .. }) => time,
+                    let vis_me_prop = geojson_feature.property("visualizer_message").unwrap();
+                    let encoded_message: GitEventMessage = serde_json::from_value(vis_me_prop.clone())?;
+                    let time_of_event = match encoded_message{
+                        GitEventMessage::Placeholder { time, .. } => time,
                         _ => continue,
                     };
                     let time_plus_wait_time = Instant::now().add(HOLD_FOR);
