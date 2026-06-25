@@ -1,6 +1,7 @@
 use std::cmp::{Ordering, Reverse};
 use std::collections::BinaryHeap;
 use std::ops::Add;
+use std::str::FromStr;
 use async_nats::jetstream;
 use async_nats::jetstream::consumer::{
     AckPolicy,
@@ -18,6 +19,7 @@ use std::time::Duration;
 use async_nats::jetstream::Message;
 use chrono::{DateTime, Utc};
 use futures_util::future::pending;
+use geojson::Feature;
 use visualizer_protocol::GitEventMessage;
 use serde::Deserialize;
 use tokio::time::{sleep_until, Instant};
@@ -32,12 +34,12 @@ const HOLD_FOR: Duration = Duration::from_secs(248);
 #[derive(Debug)]
 struct BufferedMessage {
     event_time: i64,
-    git_event_message: GitEventMessage,
+    git_event_message: Feature,
     time_to_wait_for: Instant,
 }
 
 impl BufferedMessage {
-    fn new(p0: GitEventMessage, p1: DateTime<Utc>, time_to_wait_for: Instant) -> Self {
+    fn new(p0: Feature, p1: DateTime<Utc>, time_to_wait_for: Instant) -> Self {
         let event_time = p1.timestamp_millis();
         Self {
             event_time,
@@ -141,12 +143,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if let Some(message) = msg {
                     let message = message?;
                     let message_string = String::from_utf8(message.payload.to_vec());
-                    let payload: GitEventMessage = serde_json::from_slice(&message.payload)?;
-                    let time_of_event = match payload {
-                        GitEventMessage::Placeholder { time, .. } => time,
+
+                    let geojson_feature: Feature = message_string?.parse()?;
+                    let time_of_event = match serde_json::from_str(geojson_feature.property("visualizer_message").unwrap().as_str().unwrap()) {
+                        Ok(GitEventMessage::Placeholder { time, .. }) => time,
+                        _ => continue,
                     };
                     let time_plus_wait_time = Instant::now().add(HOLD_FOR);
-                    let buffered_message = BufferedMessage::new(payload, time_of_event, time_plus_wait_time);
+                    let buffered_message = BufferedMessage::new(geojson_feature, time_of_event, time_plus_wait_time);
                     binary_buffer.push(Reverse(buffered_message));
                     message.ack().await;
                 }else{
