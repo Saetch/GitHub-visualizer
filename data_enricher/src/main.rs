@@ -90,7 +90,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             event_description: "Fake created event".to_string(),
             time: guessed_time,
         };
-        let geometry = geojson::Geometry::new(Point { coordinates: PointType::from([random_range(0.0..1.0), random_range(0.0..1.0)]) });
+        let geometry = geojson::Geometry::new(Point { coordinates: PointType::from([random_range(-180.0..180.0), random_range(-90.0..90.0)]) });
         let mut props = JsonObject::new();
         props.insert("visualizer_message".to_string(), serde_json::to_value(ge_message)?);
         //create a geojson Feature with the event data
