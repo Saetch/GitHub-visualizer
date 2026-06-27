@@ -1,0 +1,1147 @@
+{
+  "ID": {
+    "name": "Indonesia",
+    "github_developers": 4896524,
+    "n_cells": 563837
+  },
+  "MY": {
+    "name": "Malaysia",
+    "github_developers": 1058378,
+    "n_cells": 105738
+  },
+  "CL": {
+    "name": "Chile",
+    "github_developers": 748236,
+    "n_cells": 147553
+  },
+  "BO": {
+    "name": "Bolivia",
+    "github_developers": 204554,
+    "n_cells": 150172
+  },
+  "PE": {
+    "name": "Peru",
+    "github_developers": 841962,
+    "n_cells": 246633
+  },
+  "AR": {
+    "name": "Argentina",
+    "github_developers": 1485741,
+    "n_cells": 573275
+  },
+  "CY": {
+    "name": "Cyprus",
+    "github_developers": 86456,
+    "n_cells": 3908
+  },
+  "IN": {
+    "name": "India",
+    "github_developers": 24576236,
+    "n_cells": 2840256
+  },
+  "CN": {
+    "name": "China",
+    "github_developers": 11063589,
+    "n_cells": 3901503
+  },
+  "IL": {
+    "name": "Israel",
+    "github_developers": 861265,
+    "n_cells": 12353
+  },
+  "PS": {
+    "name": "Palestine",
+    "github_developers": 103770,
+    "n_cells": 5478
+  },
+  "LB": {
+    "name": "Lebanon",
+    "github_developers": 152902,
+    "n_cells": 10636
+  },
+  "ET": {
+    "name": "Ethiopia",
+    "github_developers": 227715,
+    "n_cells": 651867
+  },
+  "SS": {
+    "name": "S. Sudan",
+    "github_developers": 6142,
+    "n_cells": 78224
+  },
+  "SO": {
+    "name": "Somalia",
+    "github_developers": 64612,
+    "n_cells": 88730
+  },
+  "KE": {
+    "name": "Kenya",
+    "github_developers": 616490,
+    "n_cells": 241496
+  },
+  "MW": {
+    "name": "Malawi",
+    "github_developers": 31019,
+    "n_cells": 89573
+  },
+  "TZ": {
+    "name": "Tanzania",
+    "github_developers": 106127,
+    "n_cells": 531188
+  },
+  "SY": {
+    "name": "Syria",
+    "github_developers": 59799,
+    "n_cells": 73187
+  },
+  "FR": {
+    "name": "France",
+    "github_developers": 3756972,
+    "n_cells": 736958
+  },
+  "SR": {
+    "name": "Suriname",
+    "github_developers": 8082,
+    "n_cells": 5486
+  },
+  "GY": {
+    "name": "Guyana",
+    "github_developers": 10103,
+    "n_cells": 7509
+  },
+  "KR": {
+    "name": "South Korea",
+    "github_developers": 2900539,
+    "n_cells": 117819
+  },
+  "MA": {
+    "name": "Morocco",
+    "github_developers": 822452,
+    "n_cells": 98392
+  },
+  "CR": {
+    "name": "Costa Rica",
+    "github_developers": 214810,
+    "n_cells": 31381
+  },
+  "NI": {
+    "name": "Nicaragua",
+    "github_developers": 63669,
+    "n_cells": 76539
+  },
+  "CG": {
+    "name": "Congo",
+    "github_developers": 15493,
+    "n_cells": 28174
+  },
+  "CD": {
+    "name": "Dem. Rep. Congo",
+    "github_developers": 56465,
+    "n_cells": 499707
+  },
+  "BT": {
+    "name": "Bhutan",
+    "github_developers": 13253,
+    "n_cells": 9762
+  },
+  "UA": {
+    "name": "Ukraine",
+    "github_developers": 1651906,
+    "n_cells": 326380
+  },
+  "BY": {
+    "name": "Belarus",
+    "github_developers": 390305,
+    "n_cells": 144942
+  },
+  "NA": {
+    "name": "Namibia",
+    "github_developers": 19761,
+    "n_cells": 119086
+  },
+  "ZA": {
+    "name": "South Africa",
+    "github_developers": 962146,
+    "n_cells": 533820
+  },
+  "MF": {
+    "name": "St-Martin",
+    "github_developers": 339,
+    "n_cells": 79
+  },
+  "SX": {
+    "name": "Sint Maarten",
+    "github_developers": 1153,
+    "n_cells": 26
+  },
+  "OM": {
+    "name": "Oman",
+    "github_developers": 85833,
+    "n_cells": 38071
+  },
+  "UZ": {
+    "name": "Uzbekistan",
+    "github_developers": 349244,
+    "n_cells": 138892
+  },
+  "KZ": {
+    "name": "Kazakhstan",
+    "github_developers": 413225,
+    "n_cells": 244914
+  },
+  "TJ": {
+    "name": "Tajikistan",
+    "github_developers": 22663,
+    "n_cells": 38440
+  },
+  "LT": {
+    "name": "Lithuania",
+    "github_developers": 208505,
+    "n_cells": 82199
+  },
+  "BR": {
+    "name": "Brazil",
+    "github_developers": 7653586,
+    "n_cells": 2898632
+  },
+  "UY": {
+    "name": "Uruguay",
+    "github_developers": 149551,
+    "n_cells": 65390
+  },
+  "MN": {
+    "name": "Mongolia",
+    "github_developers": 80716,
+    "n_cells": 46650
+  },
+  "RU": {
+    "name": "Russia",
+    "github_developers": 4490870,
+    "n_cells": 1315175
+  },
+  "CZ": {
+    "name": "Czechia",
+    "github_developers": 556332,
+    "n_cells": 93842
+  },
+  "DE": {
+    "name": "Germany",
+    "github_developers": 4858805,
+    "n_cells": 493014
+  },
+  "EE": {
+    "name": "Estonia",
+    "github_developers": 136016,
+    "n_cells": 54189
+  },
+  "LV": {
+    "name": "Latvia",
+    "github_developers": 164021,
+    "n_cells": 74771
+  },
+  "NO": {
+    "name": "Norway",
+    "github_developers": 473076,
+    "n_cells": 88775
+  },
+  "SE": {
+    "name": "Sweden",
+    "github_developers": 962139,
+    "n_cells": 213101
+  },
+  "FI": {
+    "name": "Finland",
+    "github_developers": 492059,
+    "n_cells": 223770
+  },
+  "VN": {
+    "name": "Vietnam",
+    "github_developers": 2760619,
+    "n_cells": 220654
+  },
+  "KH": {
+    "name": "Cambodia",
+    "github_developers": 208188,
+    "n_cells": 77963
+  },
+  "LU": {
+    "name": "Luxembourg",
+    "github_developers": 57359,
+    "n_cells": 3752
+  },
+  "AE": {
+    "name": "United Arab Emirates",
+    "github_developers": 591961,
+    "n_cells": 23729
+  },
+  "BE": {
+    "name": "Belgium",
+    "github_developers": 696057,
+    "n_cells": 49612
+  },
+  "GE": {
+    "name": "Georgia",
+    "github_developers": 183911,
+    "n_cells": 36869
+  },
+  "MK": {
+    "name": "North Macedonia",
+    "github_developers": 76972,
+    "n_cells": 14974
+  },
+  "AL": {
+    "name": "Albania",
+    "github_developers": 94816,
+    "n_cells": 23493
+  },
+  "AZ": {
+    "name": "Azerbaijan",
+    "github_developers": 176566,
+    "n_cells": 41933
+  },
+  "XK": {
+    "name": "Kosovo",
+    "github_developers": 44202,
+    "n_cells": 8306
+  },
+  "TR": {
+    "name": "Turkey",
+    "github_developers": 2362908,
+    "n_cells": 321435
+  },
+  "ES": {
+    "name": "Spain",
+    "github_developers": 2574611,
+    "n_cells": 423160
+  },
+  "LA": {
+    "name": "Laos",
+    "github_developers": 36490,
+    "n_cells": 83477
+  },
+  "KG": {
+    "name": "Kyrgyzstan",
+    "github_developers": 109802,
+    "n_cells": 49048
+  },
+  "AM": {
+    "name": "Armenia",
+    "github_developers": 131918,
+    "n_cells": 9668
+  },
+  "DK": {
+    "name": "Denmark",
+    "github_developers": 510212,
+    "n_cells": 77060
+  },
+  "LY": {
+    "name": "Libya",
+    "github_developers": 66426,
+    "n_cells": 66547
+  },
+  "TN": {
+    "name": "Tunisia",
+    "github_developers": 389842,
+    "n_cells": 104385
+  },
+  "RO": {
+    "name": "Romania",
+    "github_developers": 734669,
+    "n_cells": 174028
+  },
+  "HU": {
+    "name": "Hungary",
+    "github_developers": 435919,
+    "n_cells": 78056
+  },
+  "SK": {
+    "name": "Slovakia",
+    "github_developers": 196050,
+    "n_cells": 41153
+  },
+  "PL": {
+    "name": "Poland",
+    "github_developers": 1934464,
+    "n_cells": 399730
+  },
+  "IE": {
+    "name": "Ireland",
+    "github_developers": 455142,
+    "n_cells": 113350
+  },
+  "GB": {
+    "name": "United Kingdom",
+    "github_developers": 5220983,
+    "n_cells": 348971
+  },
+  "GR": {
+    "name": "Greece",
+    "github_developers": 369884,
+    "n_cells": 117458
+  },
+  "ZM": {
+    "name": "Zambia",
+    "github_developers": 57053,
+    "n_cells": 324505
+  },
+  "SL": {
+    "name": "Sierra Leone",
+    "github_developers": 15066,
+    "n_cells": 41502
+  },
+  "GN": {
+    "name": "Guinea",
+    "github_developers": 13611,
+    "n_cells": 132428
+  },
+  "LR": {
+    "name": "Liberia",
+    "github_developers": 10813,
+    "n_cells": 32626
+  },
+  "CF": {
+    "name": "Central African Rep.",
+    "github_developers": 736,
+    "n_cells": 56631
+  },
+  "SD": {
+    "name": "Sudan",
+    "github_developers": 45023,
+    "n_cells": 354200
+  },
+  "DJ": {
+    "name": "Djibouti",
+    "github_developers": 5156,
+    "n_cells": 8115
+  },
+  "ER": {
+    "name": "Eritrea",
+    "github_developers": 1651,
+    "n_cells": 33537
+  },
+  "AT": {
+    "name": "Austria",
+    "github_developers": 559921,
+    "n_cells": 101040
+  },
+  "IQ": {
+    "name": "Iraq",
+    "github_developers": 401159,
+    "n_cells": 118517
+  },
+  "IT": {
+    "name": "Italy",
+    "github_developers": 1829959,
+    "n_cells": 334976
+  },
+  "CH": {
+    "name": "Switzerland",
+    "github_developers": 720134,
+    "n_cells": 50958
+  },
+  "IR": {
+    "name": "Iran",
+    "github_developers": 889642,
+    "n_cells": 269955
+  },
+  "NL": {
+    "name": "Netherlands",
+    "github_developers": 2004425,
+    "n_cells": 61485
+  },
+  "LI": {
+    "name": "Liechtenstein",
+    "github_developers": 2688,
+    "n_cells": 191
+  },
+  "CI": {
+    "name": "C\u00f4te d'Ivoire",
+    "github_developers": 101040,
+    "n_cells": 200718
+  },
+  "RS": {
+    "name": "Serbia",
+    "github_developers": 306091,
+    "n_cells": 71606
+  },
+  "ML": {
+    "name": "Mali",
+    "github_developers": 19094,
+    "n_cells": 222424
+  },
+  "SN": {
+    "name": "Senegal",
+    "github_developers": 82190,
+    "n_cells": 103157
+  },
+  "NG": {
+    "name": "Nigeria",
+    "github_developers": 1675852,
+    "n_cells": 725061
+  },
+  "BJ": {
+    "name": "Benin",
+    "github_developers": 59062,
+    "n_cells": 96995
+  },
+  "AO": {
+    "name": "Angola",
+    "github_developers": 70305,
+    "n_cells": 297980
+  },
+  "HR": {
+    "name": "Croatia",
+    "github_developers": 179941,
+    "n_cells": 51898
+  },
+  "SI": {
+    "name": "Slovenia",
+    "github_developers": 109273,
+    "n_cells": 25054
+  },
+  "QA": {
+    "name": "Qatar",
+    "github_developers": 98357,
+    "n_cells": 6364
+  },
+  "SA": {
+    "name": "Saudi Arabia",
+    "github_developers": 901427,
+    "n_cells": 252939
+  },
+  "BW": {
+    "name": "Botswana",
+    "github_developers": 26883,
+    "n_cells": 97936
+  },
+  "ZW": {
+    "name": "Zimbabwe",
+    "github_developers": 75557,
+    "n_cells": 287005
+  },
+  "PK": {
+    "name": "Pakistan",
+    "github_developers": 2281650,
+    "n_cells": 462037
+  },
+  "BG": {
+    "name": "Bulgaria",
+    "github_developers": 337077,
+    "n_cells": 66818
+  },
+  "TH": {
+    "name": "Thailand",
+    "github_developers": 1437597,
+    "n_cells": 405206
+  },
+  "SM": {
+    "name": "San Marino",
+    "github_developers": 1297,
+    "n_cells": 100
+  },
+  "HT": {
+    "name": "Haiti",
+    "github_developers": 26621,
+    "n_cells": 26463
+  },
+  "DO": {
+    "name": "Dominican Rep.",
+    "github_developers": 196190,
+    "n_cells": 31361
+  },
+  "TD": {
+    "name": "Chad",
+    "github_developers": 5566,
+    "n_cells": 151283
+  },
+  "KW": {
+    "name": "Kuwait",
+    "github_developers": 102249,
+    "n_cells": 6757
+  },
+  "SV": {
+    "name": "El Salvador",
+    "github_developers": 124177,
+    "n_cells": 19919
+  },
+  "GT": {
+    "name": "Guatemala",
+    "github_developers": 178072,
+    "n_cells": 70535
+  },
+  "TL": {
+    "name": "Timor-Leste",
+    "github_developers": 2990,
+    "n_cells": 8250
+  },
+  "BN": {
+    "name": "Brunei",
+    "github_developers": 16465,
+    "n_cells": 1556
+  },
+  "MC": {
+    "name": "Monaco",
+    "github_developers": 2941,
+    "n_cells": 30
+  },
+  "DZ": {
+    "name": "Algeria",
+    "github_developers": 532883,
+    "n_cells": 308610
+  },
+  "MZ": {
+    "name": "Mozambique",
+    "github_developers": 42814,
+    "n_cells": 401150
+  },
+  "SZ": {
+    "name": "eSwatini",
+    "github_developers": 7105,
+    "n_cells": 16049
+  },
+  "BI": {
+    "name": "Burundi",
+    "github_developers": 8509,
+    "n_cells": 27530
+  },
+  "RW": {
+    "name": "Rwanda",
+    "github_developers": 78206,
+    "n_cells": 24491
+  },
+  "MM": {
+    "name": "Myanmar",
+    "github_developers": 182911,
+    "n_cells": 154403
+  },
+  "BD": {
+    "name": "Bangladesh",
+    "github_developers": 1748240,
+    "n_cells": 150850
+  },
+  "AD": {
+    "name": "Andorra",
+    "github_developers": 6593,
+    "n_cells": 319
+  },
+  "AF": {
+    "name": "Afghanistan",
+    "github_developers": 54155,
+    "n_cells": 70926
+  },
+  "ME": {
+    "name": "Montenegro",
+    "github_developers": 27514,
+    "n_cells": 4371
+  },
+  "BA": {
+    "name": "Bosnia and Herz.",
+    "github_developers": 93254,
+    "n_cells": 46534
+  },
+  "UG": {
+    "name": "Uganda",
+    "github_developers": 130626,
+    "n_cells": 182739
+  },
+  "CU": {
+    "name": "Cuba",
+    "github_developers": 49992,
+    "n_cells": 33900
+  },
+  "HN": {
+    "name": "Honduras",
+    "github_developers": 93071,
+    "n_cells": 71914
+  },
+  "EC": {
+    "name": "Ecuador",
+    "github_developers": 383385,
+    "n_cells": 98887
+  },
+  "CO": {
+    "name": "Colombia",
+    "github_developers": 1536569,
+    "n_cells": 305050
+  },
+  "PY": {
+    "name": "Paraguay",
+    "github_developers": 84731,
+    "n_cells": 108569
+  },
+  "PT": {
+    "name": "Portugal",
+    "github_developers": 680323,
+    "n_cells": 84630
+  },
+  "MD": {
+    "name": "Moldova",
+    "github_developers": 122400,
+    "n_cells": 27119
+  },
+  "TM": {
+    "name": "Turkmenistan",
+    "github_developers": 7779,
+    "n_cells": 49751
+  },
+  "JO": {
+    "name": "Jordan",
+    "github_developers": 219362,
+    "n_cells": 14855
+  },
+  "NP": {
+    "name": "Nepal",
+    "github_developers": 443160,
+    "n_cells": 107213
+  },
+  "LS": {
+    "name": "Lesotho",
+    "github_developers": 9340,
+    "n_cells": 27435
+  },
+  "CM": {
+    "name": "Cameroon",
+    "github_developers": 125062,
+    "n_cells": 124112
+  },
+  "GA": {
+    "name": "Gabon",
+    "github_developers": 14202,
+    "n_cells": 10370
+  },
+  "NE": {
+    "name": "Niger",
+    "github_developers": 8341,
+    "n_cells": 204997
+  },
+  "BF": {
+    "name": "Burkina Faso",
+    "github_developers": 29644,
+    "n_cells": 238781
+  },
+  "TG": {
+    "name": "Togo",
+    "github_developers": 35980,
+    "n_cells": 54053
+  },
+  "GH": {
+    "name": "Ghana",
+    "github_developers": 297331,
+    "n_cells": 174625
+  },
+  "GW": {
+    "name": "Guinea-Bissau",
+    "github_developers": 1216,
+    "n_cells": 14936
+  },
+  "GI": {
+    "name": "Gibraltar",
+    "github_developers": 2891,
+    "n_cells": 5
+  },
+  "US": {
+    "name": "United States of America",
+    "github_developers": 30298253,
+    "n_cells": 5449435
+  },
+  "CA": {
+    "name": "Canada",
+    "github_developers": 3745470,
+    "n_cells": 2705229
+  },
+  "MX": {
+    "name": "Mexico",
+    "github_developers": 2637576,
+    "n_cells": 702664
+  },
+  "BZ": {
+    "name": "Belize",
+    "github_developers": 8919,
+    "n_cells": 5525
+  },
+  "PA": {
+    "name": "Panama",
+    "github_developers": 88105,
+    "n_cells": 30489
+  },
+  "VE": {
+    "name": "Venezuela",
+    "github_developers": 313110,
+    "n_cells": 135263
+  },
+  "PG": {
+    "name": "Papua New Guinea",
+    "github_developers": 14835,
+    "n_cells": 62795
+  },
+  "EG": {
+    "name": "Egypt",
+    "github_developers": 1498289,
+    "n_cells": 134005
+  },
+  "YE": {
+    "name": "Yemen",
+    "github_developers": 133164,
+    "n_cells": 45010
+  },
+  "MR": {
+    "name": "Mauritania",
+    "github_developers": 14250,
+    "n_cells": 69363
+  },
+  "GQ": {
+    "name": "Eq. Guinea",
+    "github_developers": 1966,
+    "n_cells": 3946
+  },
+  "GM": {
+    "name": "Gambia",
+    "github_developers": 7784,
+    "n_cells": 7977
+  },
+  "HK": {
+    "name": "Hong Kong",
+    "github_developers": 3262120,
+    "n_cells": 1012
+  },
+  "AU": {
+    "name": "Australia",
+    "github_developers": 2217966,
+    "n_cells": 644278
+  },
+  "GL": {
+    "name": "Greenland",
+    "github_developers": 1545,
+    "n_cells": 362
+  },
+  "FJ": {
+    "name": "Fiji",
+    "github_developers": 9826,
+    "n_cells": 6936
+  },
+  "NZ": {
+    "name": "New Zealand",
+    "github_developers": 414762,
+    "n_cells": 111225
+  },
+  "NC": {
+    "name": "New Caledonia",
+    "github_developers": 4966,
+    "n_cells": 6086
+  },
+  "MG": {
+    "name": "Madagascar",
+    "github_developers": 72187,
+    "n_cells": 338896
+  },
+  "PH": {
+    "name": "Philippines",
+    "github_developers": 2560029,
+    "n_cells": 204383
+  },
+  "LK": {
+    "name": "Sri Lanka",
+    "github_developers": 502346,
+    "n_cells": 52716
+  },
+  "CW": {
+    "name": "Cura\u00e7ao",
+    "github_developers": 4590,
+    "n_cells": 407
+  },
+  "AW": {
+    "name": "Aruba",
+    "github_developers": 3570,
+    "n_cells": 156
+  },
+  "BS": {
+    "name": "Bahamas",
+    "github_developers": 10337,
+    "n_cells": 2371
+  },
+  "TC": {
+    "name": "Turks and Caicos Is.",
+    "github_developers": 1174,
+    "n_cells": 184
+  },
+  "JP": {
+    "name": "Japan",
+    "github_developers": 4973908,
+    "n_cells": 324998
+  },
+  "PM": {
+    "name": "St. Pierre and Miquelon",
+    "github_developers": 218,
+    "n_cells": 47
+  },
+  "IS": {
+    "name": "Iceland",
+    "github_developers": 39956,
+    "n_cells": 12984
+  },
+  "PF": {
+    "name": "Fr. Polynesia",
+    "github_developers": 5623,
+    "n_cells": 897
+  },
+  "SC": {
+    "name": "Seychelles",
+    "github_developers": 21288,
+    "n_cells": 249
+  },
+  "KI": {
+    "name": "Kiribati",
+    "github_developers": 433,
+    "n_cells": 85
+  },
+  "MH": {
+    "name": "Marshall Is.",
+    "github_developers": 310,
+    "n_cells": 29
+  },
+  "TT": {
+    "name": "Trinidad and Tobago",
+    "github_developers": 38880,
+    "n_cells": 3646
+  },
+  "GD": {
+    "name": "Grenada",
+    "github_developers": 2892,
+    "n_cells": 339
+  },
+  "VC": {
+    "name": "St. Vin. and Gren.",
+    "github_developers": 2039,
+    "n_cells": 244
+  },
+  "BB": {
+    "name": "Barbados",
+    "github_developers": 9982,
+    "n_cells": 515
+  },
+  "LC": {
+    "name": "Saint Lucia",
+    "github_developers": 3960,
+    "n_cells": 513
+  },
+  "DM": {
+    "name": "Dominica",
+    "github_developers": 1672,
+    "n_cells": 415
+  },
+  "MS": {
+    "name": "Montserrat",
+    "github_developers": 120,
+    "n_cells": 27
+  },
+  "AG": {
+    "name": "Antigua and Barb.",
+    "github_developers": 2351,
+    "n_cells": 419
+  },
+  "KN": {
+    "name": "St. Kitts and Nevis",
+    "github_developers": 1633,
+    "n_cells": 237
+  },
+  "VI": {
+    "name": "U.S. Virgin Is.",
+    "github_developers": 2710,
+    "n_cells": 396
+  },
+  "PR": {
+    "name": "Puerto Rico",
+    "github_developers": 70124,
+    "n_cells": 9785
+  },
+  "AI": {
+    "name": "Anguilla",
+    "github_developers": 571,
+    "n_cells": 89
+  },
+  "VG": {
+    "name": "British Virgin Is.",
+    "github_developers": 1071,
+    "n_cells": 162
+  },
+  "JM": {
+    "name": "Jamaica",
+    "github_developers": 53762,
+    "n_cells": 9769
+  },
+  "KY": {
+    "name": "Cayman Is.",
+    "github_developers": 4020,
+    "n_cells": 284
+  },
+  "BM": {
+    "name": "Bermuda",
+    "github_developers": 2996,
+    "n_cells": 91
+  },
+  "MU": {
+    "name": "Mauritius",
+    "github_developers": 45903,
+    "n_cells": 2004
+  },
+  "KM": {
+    "name": "Comoros",
+    "github_developers": 1051,
+    "n_cells": 855
+  },
+  "ST": {
+    "name": "S\u00e3o Tom\u00e9 and Principe",
+    "github_developers": 753,
+    "n_cells": 436
+  },
+  "CV": {
+    "name": "Cabo Verde",
+    "github_developers": 6832,
+    "n_cells": 2735
+  },
+  "MT": {
+    "name": "Malta",
+    "github_developers": 40546,
+    "n_cells": 462
+  },
+  "JE": {
+    "name": "Jersey",
+    "github_developers": 4776,
+    "n_cells": 200
+  },
+  "GG": {
+    "name": "Guernsey",
+    "github_developers": 2477,
+    "n_cells": 128
+  },
+  "IM": {
+    "name": "Isle of Man",
+    "github_developers": 5180,
+    "n_cells": 820
+  },
+  "AX": {
+    "name": "\u00c5land",
+    "github_developers": 1673,
+    "n_cells": 1229
+  },
+  "FO": {
+    "name": "Faeroe Is.",
+    "github_developers": 2350,
+    "n_cells": 990
+  },
+  "SG": {
+    "name": "Singapore",
+    "github_developers": 1944204,
+    "n_cells": 449
+  },
+  "CK": {
+    "name": "Cook Is.",
+    "github_developers": 251,
+    "n_cells": 89
+  },
+  "TO": {
+    "name": "Tonga",
+    "github_developers": 697,
+    "n_cells": 341
+  },
+  "WS": {
+    "name": "Samoa",
+    "github_developers": 893,
+    "n_cells": 1112
+  },
+  "SB": {
+    "name": "Solomon Is.",
+    "github_developers": 1315,
+    "n_cells": 5489
+  },
+  "MV": {
+    "name": "Maldives",
+    "github_developers": 21032,
+    "n_cells": 34
+  },
+  "FM": {
+    "name": "Micronesia",
+    "github_developers": 523,
+    "n_cells": 328
+  },
+  "VU": {
+    "name": "Vanuatu",
+    "github_developers": 1201,
+    "n_cells": 3127
+  },
+  "AS": {
+    "name": "American Samoa",
+    "github_developers": 790,
+    "n_cells": 136
+  },
+  "PW": {
+    "name": "Palau",
+    "github_developers": 367,
+    "n_cells": 143
+  },
+  "GU": {
+    "name": "Guam",
+    "github_developers": 5679,
+    "n_cells": 441
+  },
+  "MP": {
+    "name": "N. Mariana Is.",
+    "github_developers": 1312,
+    "n_cells": 220
+  },
+  "BH": {
+    "name": "Bahrain",
+    "github_developers": 57359,
+    "n_cells": 747
+  },
+  "MO": {
+    "name": "Macao",
+    "github_developers": 37660,
+    "n_cells": 40
+  },
+  "EU": {
+    "name": "European Union (unattributed traffic)",
+    "github_developers": 24927137,
+    "n_cells": 4179474
+  },
+  "VA": {
+    "name": "Vatican City",
+    "github_developers": 181,
+    "n_cells": 1
+  },
+  "TW": {
+    "name": "Taiwan",
+    "github_developers": 1735979,
+    "n_cells": 6
+  },
+  "GF": {
+    "name": "French Guiana",
+    "github_developers": 3600,
+    "n_cells": 3
+  },
+  "GP": {
+    "name": "Guadeloupe",
+    "github_developers": 8619,
+    "n_cells": 2
+  },
+  "MQ": {
+    "name": "Martinique",
+    "github_developers": 6943,
+    "n_cells": 2
+  },
+  "RE": {
+    "name": "R\u00e9union",
+    "github_developers": 22269,
+    "n_cells": 3
+  },
+  "YT": {
+    "name": "Mayotte",
+    "github_developers": 1588,
+    "n_cells": 2
+  },
+  "BQ": {
+    "name": "Caribbean Netherlands",
+    "github_developers": 730,
+    "n_cells": 3
+  }
+}
