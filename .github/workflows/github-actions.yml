@@ -13,5 +13,5 @@ jobs:
       packages: write
       actions: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - run: docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}      
