@@ -1,0 +1,17 @@
+name: Build Images
+run-name: ${{ github.actor }} 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker-images:
+    runs-on: Ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+    steps:
+    - uses: actions/checkout@v5
+    - run: docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}      
