@@ -203,13 +203,6 @@ async fn get_random_position(appstate: web::Data<AppState>) ->Result<HttpRespons
         let idx = dist.sample(&mut *rng);
         (country.lons[idx], country.lats[idx])
     };
-    let ret = (lon, lat, country.iso2.clone(), country.name.clone());
-    println!(
-        "{:.5},{:.5},{},{}",
-        lon, lat, country.iso2, country.name
-    );
-
-
 
     Ok(HttpResponse::Ok().body(format!("{:.5},{:.5},{},{}", lon, lat, country.iso2, country.name)))
 }
