@@ -545,18 +545,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "git_geo_sampler"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "anyhow",
- "rand 0.8.6",
- "rand_distr",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "h2"
 version = "0.3.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1070,6 +1058,18 @@ name = "ryu"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
+
+[[package]]
+name = "sampler"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "rand 0.8.6",
+ "rand_distr",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "scopeguard"

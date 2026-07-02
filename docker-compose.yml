@@ -1,0 +1,91 @@
+networks:
+  distr-network:
+
+
+services:
+  archive_reader:
+    container_name: archive_reader
+    image: archive_reader:latest
+    build:
+      context: ./archive_reader
+      dockerfile: Dockerfile
+    networks:
+      - distr-network
+    depends_on:
+      - nats
+  data_enricher:
+    deploy:
+      replicas: 3
+      mode: replicated
+    image: data_enricher:latest
+    build:
+      context: ./
+      dockerfile: data_enricher/Dockerfile
+    networks:
+      - distr-network
+    depends_on:
+      - nats
+  data_synchronizer:
+    container_name: data_synchronizer
+    image: data_synchronizer:latest
+    build:
+      context: ./
+      dockerfile: data_synchronizer/Dockerfile
+    networks:
+      - distr-network
+    depends_on:
+      - nats
+  websocket_server:
+    container_name: websocket_server
+    image: websocket_server:latest
+    build:
+      context: ./
+      dockerfile: websocket_server/Dockerfile
+    networks:
+      - distr-network
+    depends_on:
+      - nats
+  sampler:
+    container_name: sampler
+    image: sampler:latest
+    build:
+      context: ./sampler
+      dockerfile: Dockerfile
+    networks:
+      - distr-network
+    depends_on:
+      - nats
+
+  nats:
+    image: nats:latest
+    command:
+      - "-c"
+      - "/etc/nats/nats-server.conf"
+      - "-js"
+      - "--routes=nats-route://ruser:T0pS3cr3t@nats-seed:6222"
+    volumes:
+      - ./nats/nats_conf/nats-server1.conf:/etc/nats/nats-server.conf:ro
+    expose:
+      - "4222"
+      - "6222"
+      - "8222"
+    depends_on:
+      - nats-seed
+    networks:
+      - distr-network
+
+  nats-seed:
+    image: nats:latest
+    command:
+      - "-c"
+      - "/etc/nats/nats-server.conf"
+      - "-js"
+    volumes:
+      - ./nats/nats_conf/nats-server.conf:/etc/nats/nats-server.conf:ro
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    expose:
+      - "6222"
+    networks:
+      - distr-network

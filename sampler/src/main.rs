@@ -40,7 +40,6 @@ fn parse_args() -> Result<Args> {
     while i < raw.len() {
         match raw[i].as_str() {
             "--help" | "-h" => {
-                println!("{}", include_str!("../README_USAGE.txt"));
                 std::process::exit(0);
             }
             "--n" => {

@@ -27,7 +27,7 @@ async fn main() {
     let reader = StreamReader::new(stream);
     let decoder = GzipDecoder::new(reader);
     let mut lines = BufReader::new(decoder).lines();
-    let client = async_nats::connect("localhost:4222").await.unwrap();
+    let client = async_nats::connect("nats:4222").await.unwrap();
     let jetstream = async_nats::jetstream::new(client);
     jetstream
         .get_or_create_stream(StreamConfig {

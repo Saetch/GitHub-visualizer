@@ -28,7 +28,7 @@ struct PartialPayload {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut message_nmbr = 0;
-    let client = async_nats::connect("localhost:4222").await?;
+    let client = async_nats::connect("nats:4222").await?;
     let jetstream = jetstream::new(client.clone());
 
     // Ensure the stream exists. This is the storage layer.
@@ -88,7 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
 
-        let estimated_data_string = client.get("http://localhost:9003/random_distributed_point").send().await?.text().await?;
+        let estimated_data_string = client.get("http://sampler:9003/random_distributed_point").send().await?.text().await?;
         let parts: Vec<&str> = estimated_data_string.split(',').collect();
         let lon = parts[0];
         let lat = parts[1];

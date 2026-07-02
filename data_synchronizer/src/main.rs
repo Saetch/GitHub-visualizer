@@ -71,7 +71,7 @@ impl Ord for BufferedMessage {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = async_nats::connect("localhost:4222").await?;
+    let client = async_nats::connect("nats:4222").await?;
     let jetstream = jetstream::new(client.clone());
 
     // Ensure the stream exists. This is the storage layer.

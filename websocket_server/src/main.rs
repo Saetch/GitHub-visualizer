@@ -1,6 +1,5 @@
 use std::string::String;
 use std::ops::Add;
-use std::os::macos::raw::stat;
 use crate::jetstream::consumer::pull::Stream;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use actix_ws::{Message, MessageStream, Session};
@@ -10,15 +9,12 @@ use async_nats::jetstream::stream::{Config as StreamConfig, DiscardPolicy, Reten
 use futures_util::StreamExt;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
-use actix_web::cookie::time::macros::date;
 use actix_web::web::Data;
 use async_nats::jetstream::consumer::pull::{MessagesError, MessagesErrorKind};
-use chrono::{DateTime, TimeDelta, Utc};
+use chrono::{DateTime, Utc};
 use geojson::Feature;
-use serde::de::IntoDeserializer;
 use tokio::io::AsyncReadExt;
-use tokio::sync::{RwLock, RwLockWriteGuard};
-use tokio::time::sleep;
+use tokio::sync::{RwLock};
 use visualizer_protocol::GitEventMessage;
 
 struct AppState {
@@ -187,7 +183,7 @@ async fn get_next_message_async(stream: &mut Stream) -> Result<String, MessagesE
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let client = async_nats::connect("localhost:4222").await.expect("NATS connect failed");
+    let client = async_nats::connect("nats:4222").await.expect("NATS connect failed");
     let js = jetstream::new(client);
 
     let stream = js.get_or_create_stream(StreamConfig {
