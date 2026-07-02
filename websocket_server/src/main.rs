@@ -40,8 +40,8 @@ async fn ws_handler(
 
 
     let date = "2025-03-05";
-    let hour = "12";
-    let minute = "54";
+    let hour = "00";
+    let minute = "00";
     let start_time: DateTime<Utc> = DateTime::parse_from_rfc3339(&format!("{}T{}:{}:00Z", date, hour, minute)).unwrap().into();
 
     let index_to_start_at = find_correct_sequence_for_time(&state, start_time).await;
@@ -265,7 +265,9 @@ async fn find_correct_sequence_for_time(state: &Data<RwLock<AppState>>, target_t
         }
         println!("index ranging from {} to {}", lowest_allowed_index, highest_allowed_index);
         mid = (highest_allowed_index + lowest_allowed_index) / 2;
-
+        if mid == 0 {
+            return 1;
+        }
         let msg = state.read().await.stream.direct_get(mid).await.expect("stream info failed");
         let string = String::from_utf8(msg.payload.to_vec()).unwrap();
         let geojson_feature: Feature = string.parse().unwrap();

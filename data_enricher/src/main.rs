@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_or_create_stream(StreamConfig {
             name: "ENRICHED_UNORDERED".to_string(),
             subjects: vec!["events_unordered".to_string()],
-            storage: StorageType::Memory,
+            storage: StorageType::File,
             retention: RetentionPolicy::Interest,
             discard: DiscardPolicy::Old,
             max_age: Duration::from_secs(24 * 60 * 60),
@@ -80,6 +80,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .unwrap();
 
+    let client = reqwest::Client::new();
     while let Some(message) = messages.next().await {
         let message = message?;
 
@@ -87,7 +88,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
 
-        let estimated_data_string = reqwest::get("http://localhost:9003/random_distributed_point").await?.text().await?;
+        let estimated_data_string = client.get("http://localhost:9003/random_distributed_point").send().await?.text().await?;
         let parts: Vec<&str> = estimated_data_string.split(',').collect();
         let lon = parts[0];
         let lat = parts[1];

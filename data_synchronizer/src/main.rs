@@ -79,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_or_create_stream(StreamConfig {
             name: "ENRICHED_UNORDERED".to_string(),
             subjects: vec!["events_unordered".to_string()],
-            storage: StorageType::Memory,
+            storage: StorageType::File,
             retention: RetentionPolicy::Interest,
             discard: DiscardPolicy::Old,
             max_age: Duration::from_secs(24 * 60 * 60),
@@ -96,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 durable_name: Some("synchronizer".to_string()),
                 filter_subject: "events_unordered".to_string(),
                 ack_policy: AckPolicy::Explicit,
-                max_ack_pending: 500,
+                max_ack_pending: 2500,
                 ack_wait: Duration::from_secs(60),
                 deliver_policy: DeliverPolicy::All,
                 ..Default::default()
