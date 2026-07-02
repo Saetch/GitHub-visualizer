@@ -86,11 +86,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let partial_payload: PartialPayload = serde_json::from_slice(&message.payload)?;
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
+
+        let estimated_data_string = reqwest::get("http://localhost:9003/random_distributed_point").await?.text().await?;
+        let parts: Vec<&str> = estimated_data_string.split(',').collect();
+        let lon = parts[0];
+        let lat = parts[1];
+        let iso2 = parts[2];
+        let mut country = parts[3].to_string();
+        if parts.len() > 4 {
+            for i in 4..parts.len() {
+                country.push_str(&format!(",{}", parts[i]));
+            }
+        }
         let ge_message = GitEventMessage::Placeholder {
             event_description: "Fake created event".to_string(),
             time: guessed_time,
+            iso2: iso2.to_string(),
+            country
         };
-        let geometry = geojson::Geometry::new(Point { coordinates: PointType::from([random_range(-180.0..180.0), random_range(-90.0..90.0)]) });
+        let geometry = geojson::Geometry::new(Point { coordinates: PointType::from([lon.parse::<f64>()?, lat.parse::<f64>()?]) });
         let mut props = JsonObject::new();
         props.insert("visualizer_message".to_string(), serde_json::to_value(ge_message)?);
         //create a geojson Feature with the event data

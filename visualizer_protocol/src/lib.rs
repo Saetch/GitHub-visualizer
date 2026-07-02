@@ -5,6 +5,8 @@ pub enum GitEventMessage{
     Placeholder{
         event_description: String,
         time: chrono::DateTime<chrono::Utc>,
+        iso2: String,
+        country: String,
     }
 }
 
