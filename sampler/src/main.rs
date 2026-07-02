@@ -1,26 +1,4 @@
-/*!
-git_geo_sampler — Phase 2
-============================
-Loads the preprocessed binary index produced by preprocess.py and samples
-N (lon, lat) coordinates according to the joint distribution:
 
-    P(lon, lat)  =  P(country)  ×  P(lon, lat | country)
-
-where
-    P(country)         ∝ github_developers[country]   (2025 Q4)
-    P(lon,lat|country) ∝ population_density_cell      (GHS-POP 2020 1 km)
-
-Usage:
-    git_geo_sampler [OPTIONS]
-
-Options:
-    --n <N>             Number of samples  [default: 1000]
-    --cells <PATH>      Path to country_cells.bin  [default: ../data/country_cells.bin]
-    --meta <PATH>       Path to country_meta.json  [default: ../data/country_meta.json]
-    --output <PATH>     Output CSV path            [default: samples.csv]
-    --seed <SEED>       Optional u64 random seed
-    --help              Print this help
-*/
 
 use anyhow::{Context, Result};
 use rand::prelude::{RngCore, SeedableRng, StdRng, thread_rng};
@@ -31,14 +9,13 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::PathBuf;
-
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 // ---------------------------------------------------------------------------
 // Minimal CLI parser (no clap)
 // ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 struct Args {
-    n:      usize,
     cells:  PathBuf,
     meta:   PathBuf,
     output: PathBuf,
@@ -48,7 +25,6 @@ struct Args {
 impl Default for Args {
     fn default() -> Self {
         Args {
-            n:      1000,
             cells:  PathBuf::from("../data/country_cells.bin"),
             meta:   PathBuf::from("../data/country_meta.json"),
             output: PathBuf::from("samples.csv"),
@@ -69,7 +45,6 @@ fn parse_args() -> Result<Args> {
             }
             "--n" => {
                 i += 1;
-                a.n = raw[i].parse().context("--n must be a positive integer")?;
             }
             "--cells" => { i += 1; a.cells = PathBuf::from(&raw[i]); }
             "--meta"  => { i += 1; a.meta  = PathBuf::from(&raw[i]); }
@@ -205,17 +180,58 @@ fn build_country_dist(
 // Main
 // ---------------------------------------------------------------------------
 
-fn main() -> Result<()> {
-    let args = parse_args()?;
+async fn get_random_position(appstate: web::Data<AppState>) ->Result<HttpResponse, actix_web::Error> {
+
+    let args = &appstate.args;
+    let countries = &appstate.countries;
+    let country_dist = &appstate.country_dist;
+
+    // ---- RNG ----
+    let mut rng: Box<dyn RngCore> = match args.seed {
+        Some(s) => Box::new(StdRng::seed_from_u64(s)),
+        None    => Box::new(thread_rng()),
+    };
+
+    // ---- Sample ----
+
+    let cidx = country_dist.sample(&mut *rng);
+    let country = &countries[cidx];
+    // sample_cell needs a concrete Rng — use thread_rng for the inner call
+    let (lon, lat) = {
+        let dist = WeightedIndex::new(&country.weights)
+            .expect("Invalid cell weights");
+        let idx = dist.sample(&mut *rng);
+        (country.lons[idx], country.lats[idx])
+    };
+    let ret = (lon, lat, country.iso2.clone(), country.name.clone());
+    println!(
+        "{:.5},{:.5},{},{}",
+        lon, lat, country.iso2, country.name
+    );
+
+
+
+    Ok(HttpResponse::Ok().body(format!("{:.5},{:.5},{},{}", lon, lat, country.iso2, country.name)))
+}
+
+struct AppState {
+    countries: Vec<CountryCells>,
+    country_dist: WeightedIndex<f64>,
+    args: Args,
+}
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let args = parse_args().unwrap();
+
 
     // ---- Load binary index ----
-    let mut countries = load_cells(&args.cells)?;
+    let mut countries = load_cells(&args.cells).unwrap();
 
     // ---- Load metadata ----
     let meta_str = std::fs::read_to_string(&args.meta)
-        .with_context(|| format!("Cannot read meta file: {}", args.meta.display()))?;
+        .with_context(|| format!("Cannot read meta file: {}", args.meta.display())).unwrap();
     let meta: HashMap<String, CountryMeta> =
-        serde_json::from_str(&meta_str).context("Failed to parse country_meta.json")?;
+        serde_json::from_str(&meta_str).context("Failed to parse country_meta.json").unwrap();
 
     apply_meta(&mut countries, &meta);
     eprintln!(
@@ -225,41 +241,23 @@ fn main() -> Result<()> {
     );
 
     // ---- Build country distribution ----
-    let country_dist = build_country_dist(&countries, &meta)?;
+    let country_dist = build_country_dist(&countries, &meta).unwrap();
 
-    // ---- RNG ----
-    let mut rng: Box<dyn RngCore> = match args.seed {
-        Some(s) => Box::new(StdRng::seed_from_u64(s)),
-        None    => Box::new(thread_rng()),
-    };
 
-    // ---- Sample ----
-    eprintln!("Sampling {} points …", args.n);
 
-    let out_file = File::create(&args.output)
-        .with_context(|| format!("Cannot create output: {}", args.output.display()))?;
-    let mut writer = BufWriter::new(out_file);
-    writeln!(writer, "lon,lat,iso2,country_name")?;
+    let state = web::Data::new( AppState {
+        countries,
+        country_dist,
+        args,
+    });
 
-    for _ in 0..args.n {
-        let cidx = country_dist.sample(&mut *rng);
-        let country = &countries[cidx];
-        // sample_cell needs a concrete Rng — use thread_rng for the inner call
-        let (lon, lat) = {
-            let dist = WeightedIndex::new(&country.weights)
-                .expect("Invalid cell weights");
-            let idx = dist.sample(&mut *rng);
-            (country.lons[idx], country.lats[idx])
-        };
-        writeln!(
-            writer,
-            "{:.5},{:.5},{},{}",
-            lon, lat, country.iso2, country.name
-        )?;
-    }
 
-    writer.flush()?;
-    eprintln!("Done! Wrote {} samples to {}", args.n, args.output.display());
-
-    Ok(())
+    HttpServer::new(move || {
+        App::new()
+            .app_data(state.clone())
+            .route("/random_distributed_point", web::get().to(get_random_position))
+    })
+        .bind("0.0.0.0:9003")?
+        .run()
+        .await
 }
