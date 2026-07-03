@@ -1,8 +1,19 @@
 networks:
   distr-network:
-
+volumes:
+  preprocessed_data:
 
 services:
+  preprocessor:
+    container_name: preprocessor
+    image: preprocessor:latest
+    build:
+      context: ./preprocess
+      dockerfile: Dockerfile
+    networks:
+      - distr-network
+    volumes:
+      - preprocessed_data:/data
   archive_reader:
     container_name: archive_reader
     image: archive_reader:latest
@@ -13,6 +24,7 @@ services:
       - distr-network
     depends_on:
       - nats
+      - sampler
   data_enricher:
     deploy:
       replicas: 3
@@ -25,6 +37,7 @@ services:
       - distr-network
     depends_on:
       - nats
+      - sampler
   data_synchronizer:
     container_name: data_synchronizer
     image: data_synchronizer:latest
@@ -35,6 +48,7 @@ services:
       - distr-network
     depends_on:
       - nats
+      - sampler
   websocket_server:
     container_name: websocket_server
     image: websocket_server:latest
@@ -45,6 +59,9 @@ services:
       - distr-network
     depends_on:
       - nats
+      - sampler
+    ports:
+      - "9001:9001"
   sampler:
     container_name: sampler
     image: sampler:latest
@@ -54,8 +71,29 @@ services:
     networks:
       - distr-network
     depends_on:
+      nats:
+        condition: service_started
+      preprocessor:
+        condition: service_completed_successfully
+    volumes:
+      - preprocessed_data:/data
+  frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ./react-frontend
+      dockerfile: Dockerfile
+    networks:
+      - distr-network
+    depends_on:
       - nats
-
+      - sampler
+    volumes:
+      - preprocessed_data:/data
+    ports:
+      - "3001:3000"
+      - "7999:8080"
+      - "7998:80"
   nats:
     image: nats:latest
     command:

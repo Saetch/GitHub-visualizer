@@ -13,7 +13,7 @@ use async_nats::jetstream::stream::{
 };
 use futures_util::StreamExt;
 use std::time::Duration;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Timelike, Utc};
 use geojson::GeometryValue::Point;
 use geojson::{Feature, JsonObject, PointType};
 use rand::random_range;
@@ -45,6 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .await?;
 
+    //sleep for 1 second
+    tokio::time::sleep(Duration::from_secs(1)).await;
     // Ensure a durable consumer exists. This is the read cursor.
     let consumer = stream
         .get_or_create_consumer(
@@ -62,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     let mut messages = consumer.messages().await?;
-
+    tokio::time::sleep(Duration::from_secs(1)).await;
 
     let dispatch_jetstream = async_nats::jetstream::new(client);
     dispatch_jetstream
@@ -87,8 +89,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let partial_payload: PartialPayload = serde_json::from_slice(&message.payload)?;
         let time_of_event = partial_payload.created_at;
         let guessed_time = time_of_event.add(Duration::from_millis(random_range(..1000)));
-
-        let estimated_data_string = client.get("http://sampler:9003/random_distributed_point").send().await?.text().await?;
+        let utc_hour = guessed_time.hour();
+        let estimated_data_string = client.get(format!("http://sampler:9003/random_distributed_point?utc_hour={}", utc_hour)).send().await?.text().await?;
         let parts: Vec<&str> = estimated_data_string.split(',').collect();
         let lon = parts[0];
         let lat = parts[1];

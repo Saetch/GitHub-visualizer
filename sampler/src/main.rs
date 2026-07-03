@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 // ---------------------------------------------------------------------------
 // Minimal CLI parser (no clap)
@@ -77,10 +78,28 @@ struct CountryCells {
 struct CountryMeta {
     name:               String,
     github_developers:  u64,
+    #[serde(default)]
+    utc_offset_hours: f64,
     #[allow(dead_code)]
     n_cells:            usize,
 }
 
+const ACTIVITY_CURVE: [f64; 24] = [
+    0.05, 0.05, 0.05, 0.07, 0.13, 0.24, 0.41, 0.62, 0.85, 0.97, 1.00, 0.92,
+    0.76, 0.56, 0.37, 0.22, 0.12, 0.06, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05
+];
+
+fn activity_weight(local_hour: u32) -> f64 {
+    ACTIVITY_CURVE[(local_hour % 24) as usize]
+}
+
+fn utc_hour_now() -> u32 {
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    ((secs / 3600) % 24) as u32
+}
 // ---------------------------------------------------------------------------
 // Binary reader
 // ---------------------------------------------------------------------------
@@ -159,18 +178,28 @@ fn apply_meta(countries: &mut Vec<CountryCells>, meta: &HashMap<String, CountryM
 
 /// Build a country-level WeightedIndex from github developer counts.
 fn build_country_dist(
-    countries: &[CountryCells],
-    meta: &HashMap<String, CountryMeta>,
+    countries:       &[CountryCells],
+    meta:            &HashMap<String, CountryMeta>,
+    utc_hour:        u32,
+    use_time_weight: bool,
 ) -> Result<WeightedIndex<f64>> {
-    let weights: Vec<f64> = countries
-        .iter()
-        .map(|c| meta.get(&c.iso2).map(|m| m.github_developers as f64).unwrap_or(0.0))
-        .collect();
+    let weights: Vec<f64> = countries.iter().map(|c| {
+        let Some(m) = meta.get(&c.iso2) else { return 0.0 };
+
+        let base = m.github_developers as f64;
+
+        if !use_time_weight {
+            return base;
+        }
+
+        let local_hour = ((utc_hour as f64 + m.utc_offset_hours)
+            .rem_euclid(24.0)) as u32;
+
+        base * activity_weight(local_hour)
+    }).collect();
 
     let total: f64 = weights.iter().sum();
-    if total == 0.0 {
-        anyhow::bail!("All country weights are zero — check country_meta.json");
-    }
+    anyhow::ensure!(total > 0.0, "All country weights are zero");
 
     WeightedIndex::new(&weights).context("Failed to build country WeightedIndex")
 }
@@ -178,38 +207,59 @@ fn build_country_dist(
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
+#[derive(Deserialize)]
+struct RandomPointQuery {
+    utc_hour: Option<u32>,
+    use_time_weight: Option<bool>,
+}
 
-async fn get_random_position(appstate: web::Data<AppState>) ->Result<HttpResponse, actix_web::Error> {
-
+async fn get_random_position(
+    appstate: web::Data<AppState>,
+    query: web::Query<RandomPointQuery>,
+) -> Result<HttpResponse, actix_web::Error> {
     let args = &appstate.args;
     let countries = &appstate.countries;
-    let country_dist = &appstate.country_dist;
 
-    // ---- RNG ----
     let mut rng: Box<dyn RngCore> = match args.seed {
         Some(s) => Box::new(StdRng::seed_from_u64(s)),
-        None    => Box::new(thread_rng()),
+        None => Box::new(thread_rng()),
     };
 
-    // ---- Sample ----
+    let use_time_weight = query.use_time_weight.unwrap_or(true);
+
+    let country_dist = if use_time_weight {
+        let utc_hour = query
+            .utc_hour
+            .unwrap_or_else(utc_hour_now)
+            .min(23);
+
+        &appstate.country_dists_by_hour[utc_hour as usize]
+    } else {
+        &appstate.country_dist
+    };
 
     let cidx = country_dist.sample(&mut *rng);
     let country = &countries[cidx];
-    // sample_cell needs a concrete Rng — use thread_rng for the inner call
-    let (lon, lat) = {
-        let dist = WeightedIndex::new(&country.weights)
-            .expect("Invalid cell weights");
-        let idx = dist.sample(&mut *rng);
-        (country.lons[idx], country.lats[idx])
-    };
 
-    Ok(HttpResponse::Ok().body(format!("{:.5},{:.5},{},{}", lon, lat, country.iso2, country.name)))
+    let cell_dist = WeightedIndex::new(&country.weights)
+        .expect("Invalid cell weights");
+
+    let idx = cell_dist.sample(&mut *rng);
+
+    let lon = country.lons[idx];
+    let lat = country.lats[idx];
+
+    Ok(HttpResponse::Ok().body(format!(
+        "{:.5},{:.5},{},{}",
+        lon, lat, country.iso2, country.name
+    )))
 }
 
 struct AppState {
     countries: Vec<CountryCells>,
-    country_dist: WeightedIndex<f64>,
     args: Args,
+    country_dist: WeightedIndex<f64>,
+    country_dists_by_hour: Vec<WeightedIndex<f64>>,
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -233,13 +283,15 @@ async fn main() -> std::io::Result<()> {
     );
 
     // ---- Build country distribution ----
-    let country_dist = build_country_dist(&countries, &meta).unwrap();
+    let country_dist = build_country_dist(&countries, &meta, 0, false).unwrap();
 
-
-
+    let country_dists_by_hour: Vec<WeightedIndex<f64>> = (0..24)
+        .map(|h| build_country_dist(&countries, &meta, h, true).unwrap())
+        .collect();
     let state = web::Data::new( AppState {
         countries,
         country_dist,
+        country_dists_by_hour,
         args,
     });
 

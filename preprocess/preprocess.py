@@ -384,6 +384,105 @@ def inject_missing_territories(index: dict) -> None:
 # Writers
 # ---------------------------------------------------------------------------
 
+import zoneinfo as _zoneinfo
+import datetime as _datetime
+
+# ISO2 → representative IANA timezone.
+# For multi-timezone countries the most-populated zone is chosen.
+# EU uses Europe/Berlin (central EU, largest developer base).
+_TZ_MAP: dict[str, str] = {
+    "AD": "Europe/Andorra",       "AE": "Asia/Dubai",            "AF": "Asia/Kabul",
+    "AG": "America/Antigua",      "AI": "America/Anguilla",      "AL": "Europe/Tirane",
+    "AM": "Asia/Yerevan",         "AO": "Africa/Luanda",         "AR": "America/Argentina/Buenos_Aires",
+    "AS": "Pacific/Pago_Pago",    "AT": "Europe/Vienna",         "AU": "Australia/Sydney",
+    "AW": "America/Aruba",        "AX": "Europe/Mariehamn",      "AZ": "Asia/Baku",
+    "BA": "Europe/Sarajevo",      "BB": "America/Barbados",      "BD": "Asia/Dhaka",
+    "BE": "Europe/Brussels",      "BF": "Africa/Ouagadougou",    "BG": "Europe/Sofia",
+    "BH": "Asia/Bahrain",         "BI": "Africa/Bujumbura",      "BJ": "Africa/Porto-Novo",
+    "BM": "Atlantic/Bermuda",     "BN": "Asia/Brunei",           "BO": "America/La_Paz",
+    "BQ": "America/Kralendijk",   "BR": "America/Sao_Paulo",     "BS": "America/Nassau",
+    "BT": "Asia/Thimphu",         "BW": "Africa/Gaborone",       "BY": "Europe/Minsk",
+    "BZ": "America/Belize",       "CA": "America/Toronto",       "CD": "Africa/Kinshasa",
+    "CF": "Africa/Bangui",        "CG": "Africa/Brazzaville",    "CH": "Europe/Zurich",
+    "CI": "Africa/Abidjan",       "CK": "Pacific/Rarotonga",     "CL": "America/Santiago",
+    "CM": "Africa/Douala",        "CN": "Asia/Shanghai",         "CO": "America/Bogota",
+    "CR": "America/Costa_Rica",   "CU": "America/Havana",        "CV": "Atlantic/Cape_Verde",
+    "CW": "America/Curacao",      "CY": "Asia/Nicosia",          "CZ": "Europe/Prague",
+    "DE": "Europe/Berlin",        "DJ": "Africa/Djibouti",       "DK": "Europe/Copenhagen",
+    "DM": "America/Dominica",     "DO": "America/Santo_Domingo", "DZ": "Africa/Algiers",
+    "EC": "America/Guayaquil",    "EE": "Europe/Tallinn",        "EG": "Africa/Cairo",
+    "ER": "Africa/Asmara",        "ES": "Europe/Madrid",         "ET": "Africa/Addis_Ababa",
+    "EU": "Europe/Berlin",        "FI": "Europe/Helsinki",       "FJ": "Pacific/Fiji",
+    "FM": "Pacific/Pohnpei",      "FO": "Atlantic/Faroe",        "FR": "Europe/Paris",
+    "GA": "Africa/Libreville",    "GB": "Europe/London",         "GD": "America/Grenada",
+    "GE": "Asia/Tbilisi",         "GF": "America/Cayenne",       "GG": "Europe/Guernsey",
+    "GH": "Africa/Accra",         "GI": "Europe/Gibraltar",      "GL": "America/Nuuk",
+    "GM": "Africa/Banjul",        "GN": "Africa/Conakry",        "GP": "America/Guadeloupe",
+    "GQ": "Africa/Malabo",        "GR": "Europe/Athens",         "GT": "America/Guatemala",
+    "GU": "Pacific/Guam",         "GW": "Africa/Bissau",         "GY": "America/Guyana",
+    "HK": "Asia/Hong_Kong",       "HN": "America/Tegucigalpa",   "HR": "Europe/Zagreb",
+    "HT": "America/Port-au-Prince","HU": "Europe/Budapest",      "ID": "Asia/Jakarta",
+    "IE": "Europe/Dublin",        "IL": "Asia/Jerusalem",        "IM": "Europe/Isle_of_Man",
+    "IN": "Asia/Kolkata",         "IQ": "Asia/Baghdad",          "IR": "Asia/Tehran",
+    "IS": "Atlantic/Reykjavik",   "IT": "Europe/Rome",           "JE": "Europe/Jersey",
+    "JM": "America/Jamaica",      "JO": "Asia/Amman",            "JP": "Asia/Tokyo",
+    "KE": "Africa/Nairobi",       "KG": "Asia/Bishkek",          "KH": "Asia/Phnom_Penh",
+    "KI": "Pacific/Tarawa",       "KM": "Indian/Comoro",         "KN": "America/St_Kitts",
+    "KR": "Asia/Seoul",           "KW": "Asia/Kuwait",           "KY": "America/Cayman",
+    "KZ": "Asia/Almaty",          "LA": "Asia/Vientiane",        "LB": "Asia/Beirut",
+    "LC": "America/St_Lucia",     "LI": "Europe/Vaduz",          "LK": "Asia/Colombo",
+    "LR": "Africa/Monrovia",      "LS": "Africa/Maseru",         "LT": "Europe/Vilnius",
+    "LU": "Europe/Luxembourg",    "LV": "Europe/Riga",           "LY": "Africa/Tripoli",
+    "MA": "Africa/Casablanca",    "MC": "Europe/Monaco",         "MD": "Europe/Chisinau",
+    "ME": "Europe/Podgorica",     "MF": "America/Marigot",       "MG": "Indian/Antananarivo",
+    "MH": "Pacific/Majuro",       "MK": "Europe/Skopje",         "ML": "Africa/Bamako",
+    "MM": "Asia/Yangon",          "MN": "Asia/Ulaanbaatar",      "MO": "Asia/Macau",
+    "MP": "Pacific/Saipan",       "MQ": "America/Martinique",    "MR": "Africa/Nouakchott",
+    "MS": "America/Montserrat",   "MT": "Europe/Malta",          "MU": "Indian/Mauritius",
+    "MV": "Indian/Maldives",      "MW": "Africa/Blantyre",       "MX": "America/Mexico_City",
+    "MY": "Asia/Kuala_Lumpur",    "MZ": "Africa/Maputo",         "NA": "Africa/Windhoek",
+    "NC": "Pacific/Noumea",       "NE": "Africa/Niamey",         "NG": "Africa/Lagos",
+    "NI": "America/Managua",      "NL": "Europe/Amsterdam",      "NO": "Europe/Oslo",
+    "NP": "Asia/Kathmandu",       "NZ": "Pacific/Auckland",      "OM": "Asia/Muscat",
+    "PA": "America/Panama",       "PE": "America/Lima",          "PF": "Pacific/Tahiti",
+    "PG": "Pacific/Port_Moresby", "PH": "Asia/Manila",           "PK": "Asia/Karachi",
+    "PL": "Europe/Warsaw",        "PM": "America/Miquelon",      "PR": "America/Puerto_Rico",
+    "PS": "Asia/Gaza",            "PT": "Europe/Lisbon",         "PW": "Pacific/Palau",
+    "PY": "America/Asuncion",     "QA": "Asia/Qatar",            "RE": "Indian/Reunion",
+    "RO": "Europe/Bucharest",     "RS": "Europe/Belgrade",       "RU": "Europe/Moscow",
+    "RW": "Africa/Kigali",        "SA": "Asia/Riyadh",           "SB": "Pacific/Guadalcanal",
+    "SC": "Indian/Mahe",          "SD": "Africa/Khartoum",       "SE": "Europe/Stockholm",
+    "SG": "Asia/Singapore",       "SI": "Europe/Ljubljana",      "SK": "Europe/Bratislava",
+    "SL": "Africa/Freetown",      "SM": "Europe/San_Marino",     "SN": "Africa/Dakar",
+    "SO": "Africa/Mogadishu",     "SR": "America/Paramaribo",    "SS": "Africa/Juba",
+    "ST": "Africa/Sao_Tome",      "SV": "America/El_Salvador",   "SX": "America/Lower_Princes",
+    "SY": "Asia/Damascus",        "SZ": "Africa/Mbabane",        "TC": "America/Grand_Turk",
+    "TD": "Africa/Ndjamena",      "TG": "Africa/Lome",           "TH": "Asia/Bangkok",
+    "TJ": "Asia/Dushanbe",        "TL": "Asia/Dili",             "TM": "Asia/Ashgabat",
+    "TN": "Africa/Tunis",         "TO": "Pacific/Tongatapu",     "TR": "Europe/Istanbul",
+    "TT": "America/Port_of_Spain","TW": "Asia/Taipei",           "TZ": "Africa/Dar_es_Salaam",
+    "UA": "Europe/Kyiv",          "UG": "Africa/Kampala",        "US": "America/Chicago",
+    "UY": "America/Montevideo",   "UZ": "Asia/Tashkent",         "VA": "Europe/Vatican",
+    "VC": "America/St_Vincent",   "VE": "America/Caracas",       "VG": "America/Tortola",
+    "VI": "America/St_Thomas",    "VN": "Asia/Ho_Chi_Minh",      "VU": "Pacific/Efate",
+    "WS": "Pacific/Apia",         "XK": "Europe/Belgrade",       "YE": "Asia/Aden",
+    "YT": "Indian/Mayotte",       "ZA": "Africa/Johannesburg",   "ZM": "Africa/Lusaka",
+    "ZW": "Africa/Harare",
+}
+
+def _utc_offset(iso2: str) -> float:
+    """Return the current UTC offset in fractional hours for the given ISO2 code."""
+    tz_name = _TZ_MAP.get(iso2)
+    if not tz_name:
+        return 0.0
+    try:
+        now = _datetime.datetime.now(_datetime.timezone.utc)
+        zi  = _zoneinfo.ZoneInfo(tz_name)
+        return now.astimezone(zi).utcoffset().total_seconds() / 3600
+    except Exception:
+        return 0.0
+
+
 def write_binary(index: dict, out_path: Path) -> None:
     print(f"\nWriting binary index → {out_path} …")
     with open(out_path, "wb") as f:
@@ -411,6 +510,7 @@ def write_meta(index: dict, github_data: dict, out_path: Path) -> None:
         iso2: {
             "name":               info["name"],
             "github_developers":  github_data.get(iso2, 0),
+            "utc_offset_hours":   round(_utc_offset(iso2), 2),
             "n_cells":            int(len(info["lons"])),
         }
         for iso2, info in index.items()
