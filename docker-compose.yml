@@ -92,8 +92,6 @@ services:
       - preprocessed_data:/data
     ports:
       - "3001:3000"
-      - "7999:8080"
-      - "7998:80"
   nats:
     image: nats:latest
     command:
