@@ -38,7 +38,14 @@ async fn ws_handler(
     let date = "2025-03-05";
     let hour = "17";
     let minute = "4";
-    let start_time: DateTime<Utc> = DateTime::parse_from_rfc3339(&format!("{}T{}:{}:00Z", date, hour, minute)).unwrap().into();
+
+    let hour: u32 = hour.parse().unwrap();
+    let minute: u32 = minute.parse().unwrap();
+
+    let start_time: DateTime<Utc> =
+        DateTime::parse_from_rfc3339(&format!("{date}T{hour:02}:{minute:02}:00Z"))
+            .unwrap()
+            .into();
 
     let index_to_start_at = find_correct_sequence_for_time(&state, start_time).await;
 
