@@ -51,15 +51,5 @@ jobs:
         package-name: 'ghcr.io/saetch/github_visualizer_frontend'
         package-type: container
         min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_nats'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_nats'
-        package-type: container
-        min-versions-to-keep: 1
     - run: docker compose -f ./docker-compose.yml push
 
