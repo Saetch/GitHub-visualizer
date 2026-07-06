@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sampler
+  template:
+    metadata:
+      labels:
+        app: sampler
+    spec:
+      containers:
+        - name: sampler
+          image: ghcr.io/your-org/your-repo/sampler:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: preprocessed-data
+              mountPath: /data
+      volumes:
+        - name: preprocessed-data
+          persistentVolumeClaim:
+            claimName: preprocessed-data

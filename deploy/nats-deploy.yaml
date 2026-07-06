@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      labels:
+        app: nats
+    spec:
+      containers:
+        - name: nats
+          image: nats:latest
+          imagePullPolicy: Always
+          args:
+            - "-c"
+            - "/etc/nats/nats-server.conf"
+            - "-js"
+            - "--routes=nats-route://ruser:CHANGE_ME@nats-seed:6222"
+          ports:
+            - containerPort: 4222
+              name: client
+            - containerPort: 6222
+              name: cluster
+            - containerPort: 8222
+              name: monitoring
+          volumeMounts:
+            - name: nats-config
+              mountPath: /etc/nats/nats-server.conf
+              subPath: nats-server1.conf
+      volumes:
+        - name: nats-config
+          configMap:
+            name: nats-config

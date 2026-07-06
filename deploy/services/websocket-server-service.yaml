@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-server
+spec:
+  type: ClusterIP
+  selector:
+    app: websocket-server
+  ports:
+    - name: websocket
+      port: 9001
+      targetPort: 9001

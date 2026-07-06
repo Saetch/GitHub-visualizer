@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archive-reader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archive-reader
+  template:
+    metadata:
+      labels:
+        app: archive-reader
+    spec:
+      containers:
+        - name: archive-reader
+          image: ghcr.io/your-org/your-repo/archive_reader:latest
+          imagePullPolicy: Always
