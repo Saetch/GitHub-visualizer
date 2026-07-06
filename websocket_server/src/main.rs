@@ -34,18 +34,8 @@ async fn ws_handler(
     let uuid = uuid::Uuid::new_v4();
     let consumer_name = format!("ws-gateway-{}-{}", i, uuid);
 
-
-    let date = "2025-03-05";
-    let hour = "17";
-    let minute = "4";
-
-    let hour: u32 = hour.parse().unwrap();
-    let minute: u32 = minute.parse().unwrap();
-
-    let start_time: DateTime<Utc> =
-        DateTime::parse_from_rfc3339(&format!("{date}T{hour:02}:{minute:02}:00Z"))
-            .unwrap()
-            .into();
+    let now = Utc::now();
+    let start_time = now - Duration::from_minutes(90);
 
     let index_to_start_at = find_correct_sequence_for_time(&state, start_time).await;
 
