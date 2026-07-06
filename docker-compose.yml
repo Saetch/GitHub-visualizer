@@ -6,7 +6,7 @@ volumes:
 services:
   preprocessor:
     container_name: preprocessor
-    image: preprocessor:latest
+    image: ghcr.io/saetch/github_visualizer_preprocessor:latest
     build:
       context: ./preprocess
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
       - preprocessed_data:/data
   archive_reader:
     container_name: archive_reader
-    image: archive_reader:latest
+    image: ghcr.io/saetch/github_visualizer_archive_reader:latest
     build:
       context: ./archive_reader
       dockerfile: Dockerfile
@@ -29,7 +29,7 @@ services:
     deploy:
       replicas: 3
       mode: replicated
-    image: data_enricher:latest
+    image: ghcr.io/saetch/github_visualizer_data_enricher:latest
     build:
       context: ./
       dockerfile: data_enricher/Dockerfile
@@ -40,7 +40,7 @@ services:
       - sampler
   data_synchronizer:
     container_name: data_synchronizer
-    image: data_synchronizer:latest
+    image: ghcr.io/saetch/github_visualizer_data_synchronizer:latest
     build:
       context: ./
       dockerfile: data_synchronizer/Dockerfile
@@ -51,7 +51,7 @@ services:
       - sampler
   websocket_server:
     container_name: websocket_server
-    image: websocket_server:latest
+    image: ghcr.io/saetch/github_visualizer_websocket_server:latest
     build:
       context: ./
       dockerfile: websocket_server/Dockerfile
@@ -64,7 +64,7 @@ services:
       - "9001:9001"
   sampler:
     container_name: sampler
-    image: sampler:latest
+    image: ghcr.io/saetch/github_visualizer_sampler:latest
     build:
       context: ./sampler
       dockerfile: Dockerfile
@@ -79,7 +79,7 @@ services:
       - preprocessed_data:/data
   frontend:
     container_name: frontend
-    image: frontend
+    image: ghcr.io/saetch/github_visualizer_frontend:latest
     build:
       context: ./react-frontend
       dockerfile: Dockerfile
@@ -93,7 +93,7 @@ services:
     ports:
       - "3001:3000"
   nats:
-    image: nats:latest
+    image: ghcr.io/saetch/github_visualizer_nats:latest
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
@@ -111,7 +111,7 @@ services:
       - distr-network
 
   nats-seed:
-    image: nats:latest
+    image: ghcr.io/saetch/github_visualizer_nats:latest
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
