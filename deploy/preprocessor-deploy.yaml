@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: preprocessor
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: preprocessor
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: preprocessor
+          image: ghcr.io/your-org/your-repo/preprocessor:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: preprocessed-data
+              mountPath: /data
+      volumes:
+        - name: preprocessed-data
+          persistentVolumeClaim:
+            claimName: preprocessed-data  

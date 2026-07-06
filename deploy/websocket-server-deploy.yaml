@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: websocket-server
+  template:
+    metadata:
+      labels:
+        app: websocket-server
+    spec:
+      containers:
+        - name: websocket-server
+          image: ghcr.io/your-org/your-repo/websocket_server:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9001
