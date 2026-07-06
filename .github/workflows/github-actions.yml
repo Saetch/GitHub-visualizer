@@ -14,4 +14,7 @@ jobs:
       actions: read
     steps:
     - uses: actions/checkout@v5
-    - run: docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}      
+    - run: docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
+    - run: docker compose -f docker-compose.yml build
+    - run: docker compose -f ./docker-compose.yml push
+
