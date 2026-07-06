@@ -27,6 +27,7 @@ struct PartialPayload {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tokio::time::sleep(Duration::from_secs(5)).await;
     let mut message_nmbr = 0;
     let client = async_nats::connect("nats:4222").await?;
     let jetstream = jetstream::new(client.clone());
