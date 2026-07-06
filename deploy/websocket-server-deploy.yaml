@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: websocket-server
-          image: ghcr.io/your-org/your-repo/websocket_server:latest
+          image: ghcr.io/saetch/github_visualizer_websocket_server:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9001

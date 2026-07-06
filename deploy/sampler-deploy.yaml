@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sampler
-          image: ghcr.io/your-org/your-repo/sampler:latest
+          image: ghcr.io/saetch/github_visualizer_sampler:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: preprocessed-data

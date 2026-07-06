@@ -12,7 +12,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: preprocessor
-          image: ghcr.io/your-org/your-repo/preprocessor:latest
+          image: ghcr.io/saetch/github_visualizer_preprocessor:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: preprocessed-data
@@ -20,4 +20,4 @@ spec:
       volumes:
         - name: preprocessed-data
           persistentVolumeClaim:
-            claimName: preprocessed-data  
+            claimName: preprocessed-data

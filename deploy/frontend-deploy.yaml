@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/your-org/your-repo/frontend:latest
+          image: ghcr.io/saetch/github_visualizer_frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
