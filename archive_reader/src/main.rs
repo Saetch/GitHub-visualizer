@@ -15,7 +15,7 @@ use tokio_util::io::StreamReader;
 async fn main() {
     let now = std::time::SystemTime::now();
     let date = "2025-03-05";
-    let hour = "12";
+    let hour = "17";
 
     let url = format!("https://data.gharchive.org/{date}-{hour}.json.gz");
 

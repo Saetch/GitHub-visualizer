@@ -72,6 +72,7 @@ struct CountryCells {
     lats:    Vec<f32>,
     /// Per-cell weights normalised to sum ≈ 1.0 within the country
     weights: Vec<f32>,
+    cell_dist: WeightedIndex<f32>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -150,12 +151,16 @@ fn load_cells(path: &PathBuf) -> Result<Vec<CountryCells>> {
             weights.push(f32::from_le_bytes(raw[base+8..base+12].try_into().unwrap()));
         }
 
+        let cell_dist = WeightedIndex::new(&weights)
+            .expect("Invalid cell weights");
+
         countries.push(CountryCells {
             iso2,
             name: String::new(),
             lons,
             lats,
             weights,
+            cell_dist,
         });
     }
 
@@ -240,9 +245,8 @@ async fn get_random_position(
 
     let cidx = country_dist.sample(&mut *rng);
     let country = &countries[cidx];
+    let cell_dist = &country.cell_dist;
 
-    let cell_dist = WeightedIndex::new(&country.weights)
-        .expect("Invalid cell weights");
 
     let idx = cell_dist.sample(&mut *rng);
 
@@ -290,9 +294,9 @@ async fn main() -> std::io::Result<()> {
         .collect();
     let state = web::Data::new( AppState {
         countries,
-        country_dist,
         country_dists_by_hour,
         args,
+        country_dist,
     });
 
 
