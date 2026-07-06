@@ -1,3 +1,4 @@
+use std::env;
 use async_compression::tokio::bufread::GzipDecoder;
 use async_nats::jetstream;
 use async_nats::jetstream::stream::{
@@ -10,13 +11,14 @@ use futures_util::TryStreamExt;
 use std::time::Duration as StdDuration;
 use tokio::io::{self, AsyncBufReadExt, BufReader};
 use tokio_util::io::StreamReader;
-use chrono::{Timelike, Utc};
+use chrono::{Local, Timelike, Utc};
 use tokio::time::sleep;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     let mut previous_stamp:String = "".to_string();
     let mut completed = false;
+    let nats_target= env::var("NATS_TARGET").unwrap_or("nats:4222".to_string());
     loop {
         let current_stamp = last_completed_gharchive_hour();
         if current_stamp==previous_stamp{
@@ -26,10 +28,14 @@ async fn main() {
             break;
         }
         previous_stamp = current_stamp;
-        let now = std::time::SystemTime::now();
+        let now = Utc::now();
         let url = format!("https://data.gharchive.org/{previous_stamp}.json.gz");
-        println!("Local clock shows: {:?}", &now);
-        print!("Downloading {} ...", &url);
+        let now_local = Local::now();
+        let now_utc = Utc::now();
+
+        println!("Local time: {}", now_local.format("%Y-%m-%d %H:%M:%S %Z"));
+        println!("UTC time:   {}", now_utc.format("%Y-%m-%d %H:%M:%S UTC"));
+        println!("Downloading {} ...", &url);
         let response = reqwest::get(&url).await;
         if response.is_err() {
             println!("Failed to download {}, waiting 5 minutes", &url);
@@ -52,7 +58,7 @@ async fn main() {
         let reader = StreamReader::new(stream);
         let decoder = GzipDecoder::new(reader);
         let mut lines = BufReader::new(decoder).lines();
-        let client = async_nats::connect("localhost:4222").await.unwrap();
+        let client = async_nats::connect(nats_target.to_string()).await.unwrap();
         let jetstream = async_nats::jetstream::new(client);
         jetstream
             .get_or_create_stream(StreamConfig {
@@ -77,9 +83,9 @@ async fn main() {
         }
         println!("Done");
 
-        let end = std::time::SystemTime::now();
-        let elapsed = end.duration_since(now).unwrap();
-        println!("Elapsed: {:?} ms", elapsed.as_millis());
+        let end = Utc::now();
+        let elapsed = end.signed_duration_since(now);
+        println!("Elapsed: {:?}", elapsed);
         println!("Processed {} lines", line_nmbr);
         completed = true;
         sleep(StdDuration::from_mins(5)).await
