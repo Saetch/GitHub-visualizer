@@ -7,49 +7,84 @@ on:
 
 jobs:
   docker-images:
-    runs-on: Ubuntu-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       actions: read
+
     steps:
-    - uses: actions/checkout@v5
-    - run: docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
-    - run: docker compose -f docker-compose.yml build
-    - uses: actions/delete-package-versions@v5
-      with:
-          package-name: 'ghcr.io/saetch/github_visualizer_preprocessor'
+      - uses: actions/checkout@v5
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+
+      - name: Build images
+        run: docker compose -f docker-compose.yml build
+
+      - name: Push images
+        run: docker compose -f docker-compose.yml push
+
+      - name: Delete old preprocessor versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_preprocessor
           package-type: container
           min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_archive_reader'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_data_enricher'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_data_synchronousizer'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_websocket_server'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_sampler'
-        package-type: container
-        min-versions-to-keep: 1
-    - uses: actions/delete-package-versions@v5
-      with:
-        package-name: 'ghcr.io/saetch/github_visualizer_frontend'
-        package-type: container
-        min-versions-to-keep: 1
-    - run: docker compose -f ./docker-compose.yml push
+
+      - name: Delete old archive reader versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_archive_reader
+          package-type: container
+          min-versions-to-keep: 1
+
+      - name: Delete old data enricher versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_data_enricher
+          package-type: container
+          min-versions-to-keep: 1
+
+      - name: Delete old data synchronousizer versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_data_synchronousizer
+          package-type: container
+          min-versions-to-keep: 1
+
+      - name: Delete old websocket server versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_websocket_server
+          package-type: container
+          min-versions-to-keep: 1
+
+      - name: Delete old sampler versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_sampler
+          package-type: container
+          min-versions-to-keep: 1
+
+      - name: Delete old frontend versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          owner: saetch
+          package-name: github_visualizer_frontend
+          package-type: container
+          min-versions-to-keep: 1
 
