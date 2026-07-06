@@ -93,7 +93,7 @@ services:
     ports:
       - "3001:3000"
   nats:
-    image: ghcr.io/saetch/github_visualizer_nats:latest
+    image: nats:latest
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
@@ -111,7 +111,7 @@ services:
       - distr-network
 
   nats-seed:
-    image: ghcr.io/saetch/github_visualizer_nats:latest
+    image: nats:latest
     command:
       - "-c"
       - "/etc/nats/nats-server.conf"
