@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: archive-reader
+  name: data-enricher
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: archive-reader
+      app: data-enricher
   template:
     metadata:
       labels:
-        app: archive-reader
+        app: data-enricher
     spec:
       containers:
-        - name: archive-reader
+        - name: data-enricher
           image: ghcr.io/saetch/github_visualizer_data_enricher:latest
           imagePullPolicy: Always
