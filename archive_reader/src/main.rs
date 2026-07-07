@@ -103,7 +103,7 @@ fn last_completed_gharchive_hour() -> String {
         .with_minute(0).unwrap()
         .with_second(0).unwrap()
         .with_nanosecond(0).unwrap()
-        - StdDuration::from_hours(1);
+        - StdDuration::from_hours(24 * 30 * 6);
 
     format!(
         "{}-{}",
