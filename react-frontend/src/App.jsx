@@ -3,7 +3,7 @@ import { ActivityMap } from './components/ActivityMap'
 import { StatsHud } from './components/StatsHud'
 
 const WS_URLS = [
-  'ws://cluster-laptop/distr-ws/ws',
+  'ws://cluster.laptop/distr-ws/ws',
   'ws://localhost:9001/ws',
 ]
 
