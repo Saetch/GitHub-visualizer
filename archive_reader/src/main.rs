@@ -25,7 +25,7 @@ async fn main() {
             sleep(StdDuration::from_mins(5)).await;
         }else { completed = false; }
         if completed{
-            break;
+            continue;
         }
         previous_stamp = current_stamp;
         let now = Utc::now();
