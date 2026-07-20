@@ -109,7 +109,6 @@ services:
       - nats-seed
     networks:
       - distr-network
-
   nats-seed:
     image: nats:latest
     command:
