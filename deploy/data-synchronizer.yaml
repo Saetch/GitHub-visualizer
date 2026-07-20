@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: archive-reader
+  name: data-synchronizer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: archive-reader
+      app: data-synchronizer
   template:
     metadata:
       labels:
-        app: archive-reader
+        app: data-synchronizer
     spec:
       containers:
-        - name: archive-reader
+        - name: data-synchronizer
           image: ghcr.io/saetch/github_visualizer_data_synchronizer:latest
           imagePullPolicy: Always

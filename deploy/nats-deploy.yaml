@@ -20,7 +20,7 @@ spec:
             - "-c"
             - "/etc/nats/nats-server.conf"
             - "-js"
-            - "--routes=nats-route://ruser:CHANGE_ME@nats-seed:6222"
+            - "--routes=nats-route://ruser:T0pS3cr3t@nats-seed:6222"
           ports:
             - containerPort: 4222
               name: client

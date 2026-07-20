@@ -36,7 +36,7 @@ data:
     # This Docker image has none by default, but you can pass a
     # flag to the nats-server docker image to create one to an existing server.
       routes = [
-      nats-route://ruser:T0pS3cr3t@nats-1:6222
+      nats-route://ruser:T0pS3cr3t@nats:6222
     ]
     }
 

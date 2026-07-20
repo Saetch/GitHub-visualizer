@@ -35,7 +35,7 @@ async fn ws_handler(
     let consumer_name = format!("ws-gateway-{}-{}", i, uuid);
 
     let now = Utc::now();
-    let start_time = now - Duration::from_mins(90);
+    let start_time = now - Duration::from_mins(90) - Duration::from_hours(24*30*16);
 
     let index_to_start_at = find_correct_sequence_for_time(&state, start_time).await;
 

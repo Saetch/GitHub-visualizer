@@ -19,6 +19,7 @@ async fn main() {
     let mut previous_stamp:String = "".to_string();
     let mut completed = false;
     let nats_target= env::var("NATS_TARGET").unwrap_or("nats:4222".to_string());
+    let mut total_events_read :u128 = 0;
     loop {
         let current_stamp = last_completed_gharchive_hour();
         if current_stamp==previous_stamp{
@@ -87,6 +88,8 @@ async fn main() {
         let elapsed = end.signed_duration_since(now);
         println!("Elapsed: {:?}", elapsed);
         println!("Processed {} lines", line_nmbr);
+        total_events_read += line_nmbr as u128;
+        println!("Total events processed: {}", total_events_read);
         completed = true;
         sleep(StdDuration::from_mins(5)).await
     }
@@ -103,7 +106,7 @@ fn last_completed_gharchive_hour() -> String {
         .with_minute(0).unwrap()
         .with_second(0).unwrap()
         .with_nanosecond(0).unwrap()
-        - StdDuration::from_hours(1);
+        - StdDuration::from_hours(24 * 30 * 16);
 
     format!(
         "{}-{}",
